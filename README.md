@@ -1,4 +1,7 @@
-# 夜色手记（暂定站名）
+# Le1sure7.github.io
+my web page
+
+## 夜色手记（暂定站名）
 双击 index.html 本地预览。发布时将本目录文件放入 GitHub 仓库 main 分支根目录，在 Settings → Pages 选择 Deploy from a branch → main → / (root)。
 - 修改文字：在 index.html 和 post.html 修改站名，在 index.html 修改首页介绍。
 - 写博客：修改 content.js 的 posts；每篇使用唯一 id，把新文章放在数组开头，日期用 YYYY-MM-DD。
