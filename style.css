@@ -1,0 +1,68 @@
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;color-scheme:light}
+html{--round-font:"YouYuan","幼圆","Yuanti SC","Hiragino Maru Gothic ProN","Microsoft YaHei",sans-serif;--reading-font:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+body{margin:0;background:#faf7fc;color:#32283c;font:17px/1.8 var(--reading-font)}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(90deg,#fff8f7ed,#faf4ffaf 65%,#fff6f5db),linear-gradient(0deg,#fbf8fff5,transparent 80%),url("assets/night.png") center/cover no-repeat}
+header,main,footer{width:min(1120px,90%);margin:auto}
+header{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #937b9f55}
+a{color:inherit;text-decoration:none}
+button,label{cursor:pointer}
+button,input{font:inherit;color:inherit}
+button{background:#fff9ff;border:1px solid #a794b4;border-radius:24px}
+button:focus-visible,a:focus-visible,input:focus-visible,label:focus-within{outline:2px solid #713f94;outline-offset:3px}
+.brand,h2,h3,.track strong{font-family:var(--round-font)}
+.brand{font-size:19px;letter-spacing:.12em;font-weight:700}
+.brand b,h1 span{color:#814f96}
+.search{display:flex;align-items:center;gap:6px}
+#find{width:42px;height:42px;font:30px/1 sans-serif}
+#query{width:min(32vw,230px);border:1px solid #a794b4;border-radius:22px;background:#fffaff;padding:8px 12px;animation:appear .22s ease}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:5vw;align-items:center;min-height:47vh;padding:60px 0 48px;animation:appear .7s both}
+small,time{font:600 .875rem/1.5 var(--reading-font);letter-spacing:.12em;color:#5d436b}
+h1,h2,h3,p{margin:.3em 0}
+h1{font:700 clamp(48px,7.5vw,100px)/1.2 var(--round-font);letter-spacing:.05em}
+h1 span{font:normal .4em var(--round-font);vertical-align:top;margin-left:.15em;display:inline-block;animation:glow 5s ease-in-out infinite}
+#intro{color:#45384e}
+.down{display:inline-block;margin-top:18px;border-bottom:1px solid #825391;padding-bottom:3px}
+.deck,.entry,.reader article{background:linear-gradient(125deg,#fffffffa,#fdf7fff0);border:1px solid #d4c4dd;box-shadow:0 14px 50px #59406718;border-radius:18px}
+.deck{padding:22px}
+.track{display:flex;align-items:center;gap:14px;margin:20px 0}
+.track div:last-child{min-width:0}
+.track strong{display:block;overflow-wrap:anywhere}
+.disc{flex:none;display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:repeating-radial-gradient(circle,#322c48 0 2px,#211f31 3px 5px);border:1px solid #746387;color:#d7addf;font-size:28px}
+label{display:block;font-size:.875rem;text-decoration:underline;color:#694279}
+label input{width:1px;height:1px;position:absolute;opacity:0}
+audio{width:100%;height:36px}
+#mini{display:none}
+#journal{padding:20px 0 65px}
+h2{font-size:clamp(30px,4vw,48px);line-height:1.2;margin-bottom:20px}
+.entry{display:block;padding:24px 30px;position:relative;transition:transform .24s,border-color .24s;animation:appear .5s both}
+.entry+.entry{margin-top:14px}
+.entry:hover{transform:translateY(-3px);border-color:#a97cb4}
+h3{font-size:24px}
+.entry p,time{color:#594b61}
+.entry time{display:block;margin-top:10px}
+footer{padding:20px 0 35px;border-top:1px solid #b6a2c355;color:#56485e}
+footer a{text-decoration:underline}
+.reader{max-width:800px;padding:45px 0}
+.reader article{margin-top:20px;padding:clamp(22px,5vw,60px)}
+.reader h1{font-size:clamp(36px,6vw,58px)}
+.reader article p{line-height:1.9;margin-top:1.5em}
+@keyframes appear{from{opacity:0;translate:0 8px}
+to{opacity:1;translate:0 0}
+}
+@keyframes glow{50%{opacity:.65;transform:translateY(-3px)}
+}
+@media(max-width:760px){header{height:64px}
+.hero{display:block;min-height:0;padding:64px 0 46px}
+.hero:has(#music){animation:none}
+.hero>div{animation:appear .5s}
+#music{position:fixed;bottom:14px;right:5%;z-index:3;max-width:90%}
+#mini{display:block;margin-left:auto;padding:8px 15px;background:#fff7ff}
+.deck{display:none;margin-top:6px;background:#fffaff;width:min(290px,85vw)}
+.opened .deck{display:block}
+.entry{padding:20px}
+footer{padding-bottom:80px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
