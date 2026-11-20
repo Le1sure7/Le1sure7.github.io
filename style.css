@@ -1,6 +1,6 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;color-scheme:light}
-html{--round-font:"YouYuan","幼圆","Yuanti SC","Hiragino Maru Gothic ProN","Microsoft YaHei",sans-serif;--reading-font:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+html{--round-font:Calibri,"YouYuan","幼圆","Yuanti SC","Hiragino Maru Gothic ProN","Microsoft YaHei",sans-serif;--reading-font:Calibri,"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
 body{margin:0;background:#faf7fc;color:#32283c;font:17px/1.8 var(--reading-font)}
 body:before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(90deg,#fff8f7ed,#faf4ffaf 65%,#fff6f5db),linear-gradient(0deg,#fbf8fff5,transparent 80%),url("assets/night.png") center/cover no-repeat}
 header,main,footer{width:min(1120px,90%);margin:auto}
