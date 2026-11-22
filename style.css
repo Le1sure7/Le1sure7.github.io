@@ -57,7 +57,13 @@ summary::-webkit-details-marker { display: none; }
 .type-line { position: absolute; inset: 0; }
 .cursor { display: inline-block; width: .4em; margin-left: .06em; border-bottom: .07em solid; animation: blink .85s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
-.cover-subtitle { margin: 14px 0 0; color: #fff; font-size: 1rem; letter-spacing: .055em; }
+.cover-subtitle { margin: 14px 0 0; color: #fff; font-size: 1rem; letter-spacing: .055em; overflow-wrap: anywhere; }
+.cover-signature {
+  margin: 12px 0 0; color: #fff;
+  font-family: "STXingkai", "华文行楷", "FZShuTi", "方正舒体", "Kaiti SC", "STKaiti", "KaiTi", "楷体", "FangSong", "仿宋", serif;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem); font-style: italic; font-weight: 700;
+  letter-spacing: .16em; text-indent: .16em;
+}
 .descend { position: absolute; bottom: max(24px,env(safe-area-inset-bottom)); display: grid; justify-items: center; gap: 6px; padding: 8px 14px; color: white; text-shadow: 0 1px 5px #1a132a; font-size: .9rem; }
 .shuffle-wallpaper {
   position: absolute; right: max(18px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom));
