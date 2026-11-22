@@ -2,5 +2,3 @@
 const posts = [
   {id:'first-page', title:'第一篇手记', tag:'示例文章', date:'', summary:'文章摘要待填写。', paragraphs:['文章正文待填写。']},
 ];
-// 填写 assets/ 中的音乐文件路径后，访客即可播放。
-const playlistTrack = { title:'歌单待填写', src:'' };

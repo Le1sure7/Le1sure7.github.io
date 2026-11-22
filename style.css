@@ -1,68 +1,131 @@
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;color-scheme:light}
-html{--round-font:Calibri,"YouYuan","幼圆","Yuanti SC","Hiragino Maru Gothic ProN","Microsoft YaHei",sans-serif;--reading-font:Calibri,"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
-body{margin:0;background:#faf7fc;color:#32283c;font:17px/1.8 var(--reading-font)}
-body:before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(90deg,#fff8f7ed,#faf4ffaf 65%,#fff6f5db),linear-gradient(0deg,#fbf8fff5,transparent 80%),url("assets/night.png") center/cover no-repeat}
-header,main,footer{width:min(1120px,90%);margin:auto}
-header{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #937b9f55}
-a{color:inherit;text-decoration:none}
-button,label{cursor:pointer}
-button,input{font:inherit;color:inherit}
-button{background:#fff9ff;border:1px solid #a794b4;border-radius:24px}
-button:focus-visible,a:focus-visible,input:focus-visible,label:focus-within{outline:2px solid #713f94;outline-offset:3px}
-.brand,h2,h3,.track strong{font-family:var(--round-font)}
-.brand{font-size:19px;letter-spacing:.12em;font-weight:700}
-.brand b,h1 span{color:#814f96}
-.search{display:flex;align-items:center;gap:6px}
-#find{width:42px;height:42px;font:30px/1 sans-serif}
-#query{width:min(32vw,230px);border:1px solid #a794b4;border-radius:22px;background:#fffaff;padding:8px 12px;animation:appear .22s ease}
-.hero{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:5vw;align-items:center;min-height:47vh;padding:60px 0 48px;animation:appear .7s both}
-small,time{font:600 .875rem/1.5 var(--reading-font);letter-spacing:.12em;color:#5d436b}
-h1,h2,h3,p{margin:.3em 0}
-h1{font:700 clamp(48px,7.5vw,100px)/1.2 var(--round-font);letter-spacing:.05em}
-h1 span{font:normal .4em var(--round-font);vertical-align:top;margin-left:.15em;display:inline-block;animation:glow 5s ease-in-out infinite}
-#intro{color:#45384e}
-.down{display:inline-block;margin-top:18px;border-bottom:1px solid #825391;padding-bottom:3px}
-.deck,.entry,.reader article{background:linear-gradient(125deg,#fffffffa,#fdf7fff0);border:1px solid #d4c4dd;box-shadow:0 14px 50px #59406718;border-radius:18px}
-.deck{padding:22px}
-.track{display:flex;align-items:center;gap:14px;margin:20px 0}
-.track div:last-child{min-width:0}
-.track strong{display:block;overflow-wrap:anywhere}
-.disc{flex:none;display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:repeating-radial-gradient(circle,#322c48 0 2px,#211f31 3px 5px);border:1px solid #746387;color:#d7addf;font-size:28px}
-label{display:block;font-size:.875rem;text-decoration:underline;color:#694279}
-label input{width:1px;height:1px;position:absolute;opacity:0}
-audio{width:100%;height:36px}
-#mini{display:none}
-#journal{padding:20px 0 65px}
-h2{font-size:clamp(30px,4vw,48px);line-height:1.2;margin-bottom:20px}
-.entry{display:block;padding:24px 30px;position:relative;transition:transform .24s,border-color .24s;animation:appear .5s both}
-.entry+.entry{margin-top:14px}
-.entry:hover{transform:translateY(-3px);border-color:#a97cb4}
-h3{font-size:24px}
-.entry p,time{color:#594b61}
-.entry time{display:block;margin-top:10px}
-footer{padding:20px 0 35px;border-top:1px solid #b6a2c355;color:#56485e}
-footer a{text-decoration:underline}
-.reader{max-width:800px;padding:45px 0}
-.reader article{margin-top:20px;padding:clamp(22px,5vw,60px)}
-.reader h1{font-size:clamp(36px,6vw,58px)}
-.reader article p{line-height:1.9;margin-top:1.5em}
-@keyframes appear{from{opacity:0;translate:0 8px}
-to{opacity:1;translate:0 0}
+:root {
+  color-scheme: light;
+  --round: Calibri, "YouYuan", "幼圆", "Yuanti SC", "Microsoft YaHei", sans-serif;
+  --body: Calibri, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  --cover: url("wallpaper_day/desktop/Kanade_day.jpg");
+  --paper: #faf8f8; --card: #fff; --ink: #302b39; --quiet: #665966;
+  --line: #ddd5de; --accent: #79476d; --cover-position: center 48%;
+  scroll-behavior: smooth;
 }
-@keyframes glow{50%{opacity:.65;transform:translateY(-3px)}
+:root[data-theme="night"] {
+  color-scheme: dark; --cover: url("wallpaper_night/desktop/sola_night.jpg"); --cover-position: center 45%;
+  --paper: #151521; --card: #201e30; --ink: #f5eef8; --quiet: #c4b7cb;
+  --line: #443b50; --accent: #e1b9d5;
 }
-@media(max-width:760px){header{height:64px}
-.hero{display:block;min-height:0;padding:64px 0 46px}
-.hero:has(#music){animation:none}
-.hero>div{animation:appear .5s}
-#music{position:fixed;bottom:14px;right:5%;z-index:3;max-width:90%}
-#mini{display:block;margin-left:auto;padding:8px 15px;background:#fff7ff}
-.deck{display:none;margin-top:6px;background:#fffaff;width:min(290px,85vw)}
-.opened .deck{display:block}
-.entry{padding:20px}
-footer{padding-bottom:80px}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; color: var(--ink); background: var(--paper); font: 17px/1.75 var(--body); }
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; color: inherit; }
+button, summary { cursor: pointer; }
+:focus-visible { outline: 3px solid #df9ecf; outline-offset: 3px; }
+h1,h2,h3 { font-family: var(--round); }
+.cover {
+  position: relative; isolation: isolate; display: grid; place-items: center;
+  min-height: 100vh; min-height: 100svh; padding: 6rem 22px;
+  color: white; background: #282538;
 }
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.cover::before, .cover::after, .petals { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.cover::before { z-index: -3; background: var(--cover) var(--cover-position)/cover no-repeat; }
+.cover::after {
+  z-index: -2;
+  background: linear-gradient(180deg, #14112648, transparent 24%, transparent 65%, #12102683),
+    radial-gradient(ellipse at center, #17122470 0%, #17122425 57%, transparent 85%);
+}
+[data-theme="night"] .cover::after { background: linear-gradient(180deg,#0c0b2260,#100d2c48 50%,#0d0a22a3); }
+.topbar { position: absolute; z-index: 5; inset: 0 0 auto; display: flex; justify-content: space-between; align-items: start; padding: 20px clamp(18px, 3vw, 50px); pointer-events: none; }
+.topbar > * { pointer-events: auto; }
+.menu, .search { position: relative; }
+.menu summary,.back,#find,#query { background: #211d35a6; color: #fff; border: 1px solid #fffa; }
+.menu summary,.back { display: inline-flex; align-items: center; gap: 10px; padding: 5px 13px; font-size: .875rem; letter-spacing: .08em; border-radius: 4px; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+.menu i { font-style: normal; }
+.menu-links,.hits { position: absolute; top: calc(100% + 4px); min-width: 132px; padding: 6px; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 20px #100f2a28; }
+.menu-links a,.hits a,.hits p { display: block; margin: 0; padding: 6px 12px; font-size: 1rem; overflow-wrap: anywhere; }
+.menu-links a:hover,.hits a:hover { color: var(--accent); text-decoration: underline; }
+.search { display: grid; justify-items: end; }
+#find { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; padding: 0; }
+#find[aria-expanded="true"] { display: none; }
+#query { width: clamp(145px,38vw,250px); height: 42px; padding: 0 15px; border-radius: 24px; animation: reveal .18s ease-out; }
+#query::placeholder { color: #f1eaf2; }
+.hits { top: 100%; right: 0; width: 100%; }
+.no-results { color: var(--quiet); }
+@keyframes reveal { from { clip-path: inset(0 0 0 calc(100% - 42px) round 21px); } to { clip-path: inset(0 round 21px); } }
+.cover-copy { position: absolute; left: var(--title-x, 50%); top: var(--title-y, 57%); transform: translate(-50%, -50%); width: min(43%, 48rem); text-align: center; text-shadow: 0 2px 12px #130f2dc9, 0 1px 3px #130f2d94; }
+.cover-copy h1 { position: relative; font-size: clamp(2rem,4vw,4rem); line-height: 1.16; margin: 0; overflow-wrap: anywhere; letter-spacing: .012em; }
+.type-reserve { visibility: hidden; padding-inline-end: .6em; }
+.type-line { position: absolute; inset: 0; }
+.cursor { display: inline-block; width: .4em; margin-left: .06em; border-bottom: .07em solid; animation: blink .85s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.cover-subtitle { margin: 14px 0 0; color: #fff; font-size: 1rem; letter-spacing: .055em; }
+.descend { position: absolute; bottom: max(24px,env(safe-area-inset-bottom)); display: grid; justify-items: center; gap: 6px; padding: 8px 14px; color: white; text-shadow: 0 1px 5px #1a132a; font-size: .9rem; }
+.shuffle-wallpaper {
+  position: absolute; right: max(18px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom));
+  min-height: 44px; padding: 5px 16px; background: #211d35ad; color: white;
+  border: 1px solid #fffa; border-radius: 24px; font-size: .875rem;
+}
+.shuffle-wallpaper:hover { background: #211d35e0; }
+@media (max-aspect-ratio: 5/4) {
+  .cover-copy { left: 50%; top: 74%; width: 92%; }
+}
+.descend i { width: 11px; height: 11px; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.petals { z-index: -1; overflow: hidden; }
+.petal { position: absolute; top: -25px; left: var(--x); width: var(--w); height: calc(var(--w) * .5); border-radius: 85% 5% 75% 15%; background: linear-gradient(130deg,#ffe5f1,#f4b5cf); animation: drift var(--duration) linear var(--delay) infinite; }
+@keyframes drift { 0% { transform: translate3d(0,-4vh,0) rotate(5deg); opacity: 0; } 12%,82% { opacity: .72; } 49% { transform: translate3d(-5vw,49vh,0) rotate(140deg) scaleY(.55); } 100% { transform: translate3d(6vw,108vh,0) rotate(350deg); opacity: 0; } }
+.cover.offscreen .petal, .cover.offscreen .cursor { animation-play-state: paused; }
+.journal-layout,.reader,footer { width: min(1120px,90%); margin-inline: auto; }
+.journal-layout { max-width: 860px; padding: 65px 0 76px; }
+.journal-layout h2 { margin: 0 0 23px; line-height: 1.25; font-size: clamp(2rem,3vw,2.7rem); }
+.entry { display: block; border-top: 1px solid var(--line); padding: 20px 0; }
+.entry h3 { margin: 4px 0; font-size: 1.6rem; }
+.entry:hover h3,.return:hover { color: var(--accent); }
+.entry p,.reader p { margin: .5rem 0; }
+.entry small,.entry time,.entry p,footer,.return { color: var(--quiet); }
+.entry small,.entry time { font-size: .9rem; }
+footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: .9rem; }
+
+.reader { max-width: 760px; padding: 48px 0 100px; }
+.reader article { margin-top: 24px; font-size: 1.1rem; line-height: 1.95; }
+@media (max-width: 760px) {
+  .journal-layout { padding: 40px 0 75px; }
+  .cover-copy { max-width: 96%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { scroll-behavior: auto; }
+  *,*::before,*::after { animation: none !important; }
+  .petals,.cursor { display: none; }
 }
 
+
+/* Shared navigation and locally bundled emoji artwork */
+.topbar { justify-content: flex-start; gap: 8px; }
+.topbar .menu { margin-right: auto; }
+.theme-toggle { width: 42px; height: 42px; flex: none; display: grid; place-items: center; padding: 0; border: 1px solid #fffa; border-radius: 50%; background: #211d35a6; }
+.emoji { display: inline-block; vertical-align: middle; object-fit: contain; }
+:root[data-theme="night"] .emoji { filter: invert(1); }
+.topbar #find, .topbar .theme-toggle, .topbar #query {
+  background: var(--icon-surface, #fffffff0);
+  color: var(--icon-ink, #18191c);
+  border-color: var(--icon-border, #c9ccd0);
+}
+.topbar #query::placeholder { color: inherit; opacity: .75; }
+:root[data-theme="night"] {
+  --icon-surface: #24262cf2;
+  --icon-ink: #f4f5f7;
+  --icon-border: #747782;
+}
+.topbar .emoji { width: 18px; height: 18px; }
+.menu-links button { width: 100%; text-align: left; padding: 6px 12px; background: transparent; font-size: 1rem; border: 0; border-top: 1px solid var(--line); }
+.menu-links button:disabled { color: var(--quiet); cursor: default; }
+@media (max-width: 380px) { #query { width: 34vw; } }
+
+/* Git logomark by Jason Long, https://git-scm.com/community/logos
+   Licensed under https://creativecommons.org/licenses/by/3.0/ */
+.github-profile {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+}
+:root[data-theme="night"] .github-profile img { filter: brightness(0) invert(1); }

@@ -1,1 +1,22 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>手记正文</title><link rel="stylesheet" href="style.css"><script defer src="content.js"></script><script defer src="app.js"></script></head><body><header><a class="brand" href="./index.html"><b>✦</b> 夜色手记</a></header><main class="reader"><a href="./index.html#journal">← 返回博客</a><article id="story"></article></main></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>手记正文</title>
+  <script src="theme.js"></script><link rel="stylesheet" href="style.css">
+  <script defer src="content.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+  <header class="cover" id="top">
+    <nav class="topbar" aria-label="站点导航">
+      <details class="menu"><summary aria-label="打开导航"><i aria-hidden="true">☰</i> MENU</summary><div class="menu-links"><a href="./index.html">首页</a><a href="./index.html#journal">我的博客</a><a href="#story">阅读本文</a><button type="button" data-auto-theme>跟随时间</button></div></details>
+      <a class="back" href="./index.html#journal">返回博客</a>
+      <button class="theme-toggle" type="button" hidden data-toggle-theme aria-label="切换主题"><img class="emoji" alt="" width="21" height="21"></button>
+    </nav>
+    <div class="petals" aria-hidden="true"></div>
+    <div class="cover-copy"><h1 id="cover-title">手记正文</h1><p class="cover-subtitle" id="post-meta"></p></div>
+    <button class="shuffle-wallpaper" type="button" data-shuffle-wallpaper hidden title="随机切换当前主题的壁纸">换壁纸</button>
+    <a class="descend" href="#story">阅读正文<i aria-hidden="true"></i></a>
+  </header>
+  <main class="reader" id="story"><a class="return" href="./index.html#journal">← 返回博客</a><article></article></main>
+</body></html>

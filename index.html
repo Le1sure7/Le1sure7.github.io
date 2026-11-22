@@ -1,5 +1,26 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>夜色手记 · 个人博客</title><link rel="stylesheet" href="style.css"><script defer src="content.js"></script><script defer src="app.js"></script></head><body>
-<header><a class="brand" href="./index.html"><b>✦</b> 夜色手记</a><div class="search"><button id="find" aria-label="展开站内搜索" aria-expanded="false">⌕</button><input id="query" type="search" hidden placeholder="搜索博客…" aria-label="搜索文章标题、标签或正文"></div></header>
-<main><section class="hero"><div><small>AFTER HOURS　 /　 BLOG</small><h1>夜色手记<span>✦</span></h1><p id="intro">个人介绍 · 待填写</p><a class="down" href="#journal">浏览手记 ↓</a></div>
-<aside id="music"><button id="mini" aria-expanded="false">♫ 音乐</button><div class="deck"><small>♫　 MUSIC PLAYER</small><div class="track"><div class="disc">●</div><div><strong id="song">歌单待填写</strong><label>选择本地音乐<input id="file" type="file" accept="audio/*"></label></div></div><audio controls preload="none"></audio></div></aside></section>
-<section id="journal"><small>JOURNAL</small><h2>我的 Blog</h2><div id="entries"></div><p id="empty" hidden role="status">没有找到匹配的文章。</p></section></main><footer>夜色手记　✦　<a href="https://github.com/leleo886/leleo-home-page">主页模板</a></footer></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Le1SurE7_7's Blog · 夜色手记</title>
+  <script src="theme.js"></script><link rel="stylesheet" href="style.css">
+  <script defer src="content.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+  <header class="cover" id="top">
+    <nav class="topbar" aria-label="站点导航">
+      <details class="menu"><summary aria-label="打开导航"><i aria-hidden="true">☰</i> MENU</summary><div class="menu-links"><a href="./index.html">首页</a><a href="#journal">我的博客</a><button type="button" data-auto-theme>跟随时间</button></div></details>
+      <div class="search"><button id="find" aria-label="站内搜索" aria-controls="query" aria-expanded="false"><img class="emoji" src="assets/emoji/1f50d.svg" alt="" width="20" height="20"></button><input id="query" type="search" hidden placeholder="搜索博客…" aria-label="搜索文章标题、标签或正文"><div class="hits" id="hits" hidden></div></div>
+      <button class="theme-toggle" type="button" hidden data-toggle-theme aria-label="切换主题"><img class="emoji" alt="" width="21" height="21"></button>
+    </nav>
+    <div class="petals" aria-hidden="true"></div>
+    <div class="cover-copy"><h1 id="cover-title">Le1SurE7_7's Blog</h1>
+      <p class="cover-subtitle" id="intro">个人介绍 · 待填写</p></div>
+    <button class="shuffle-wallpaper" type="button" data-shuffle-wallpaper hidden title="随机切换当前主题的壁纸">换壁纸</button>
+    <a class="descend" href="#journal">浏览手记<i aria-hidden="true"></i></a>
+  </header>
+  <main class="journal-layout" id="journal">
+    <section aria-labelledby="journal-title"><h2 id="journal-title" tabindex="-1">我的 Blog</h2><div id="entries"></div><p id="empty" hidden role="status">没有找到匹配的文章。</p></section>
+  </main>
+  <footer><a class="github-profile" href="https://github.com/Le1sure7" aria-label="Le1sure7 的 GitHub 主页" title="Le1sure7 的 GitHub 主页"><img src="assets/git-mark.svg" alt="" width="24" height="24"></a><span>Le1SurE7_7</span></footer>
+</body></html>

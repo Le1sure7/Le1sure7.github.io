@@ -1,0 +1,7 @@
+1f50d.svg — Search outline from the Bilibili homepage header.
+Source: https://www.bilibili.com/ (nav-search-btn, 17 × 17). Original path retained.
+2600.svg and 1f319.svg — Project-drawn sun and moon, matched to the search outline.
+2728.svg — Sparkles adapted from OpenMoji Black 15.1.0. Stroke weight and color adjusted.
+OpenMoji contributors: https://github.com/hfg-gmuend/openmoji/tree/15.1.0/black/svg
+The OpenMoji artwork and its adaptation use CC BY-SA 4.0:
+https://creativecommons.org/licenses/by-sa/4.0/ (LICENSE-GRAPHICS.txt).
