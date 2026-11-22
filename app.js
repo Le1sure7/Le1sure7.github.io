@@ -1,100 +1,50 @@
-const $ = s => document.querySelector(s);
+const $ = selector => document.querySelector(selector);
 function element(tag, text) {
   const node = document.createElement(tag);
   node.textContent = text;
   return node;
 }
-function bodyText(post) {
-  if (post.markdown) return post.markdown.replace(/[*~#>`]/g, ' ');
-  return (post.paragraphs || []).join(' ');
+
+function category(post) {
+  return post.category || '未分类';
 }
-function inlineNodes(text) {
-  const fragment = document.createDocumentFragment();
-  const pattern = /\*\*\*([^*]+?)\*\*\*|\*\*([^*]+?)\*\*|\*([^*]+?)\*|~~([^~]+?)~~/g;
-  let cursor = 0;
-  let match;
-  while ((match = pattern.exec(text))) {
-    if (match.index > cursor) fragment.append(text.slice(cursor, match.index));
-    const [whole, boldItalic, bold, italic, strike] = match;
-    const wrap = document.createElement(boldItalic || bold ? 'strong' : italic ? 'em' : 'del');
-    const target = boldItalic ? wrap.appendChild(document.createElement('em')) : wrap;
-    target.append(inlineNodes(boldItalic ?? bold ?? italic ?? strike));
-    fragment.append(wrap);
-    cursor = pattern.lastIndex;
-  }
-  if (cursor < text.length) fragment.append(text.slice(cursor));
-  return fragment;
+
+function tags(post) {
+  return [...new Set([...(post.tags || []), post.tag].filter(Boolean))];
 }
-function parseMarkdown(source) {
-  const lines = source.replace(/\r\n?/g, '\n').split('\n');
-  const indents = lines.filter(line => line.trim()).map(line => /^ */.exec(line)[0].length);
-  const cut = indents.length ? Math.min(...indents) : 0;
-  const blocks = [];
-  const stack = [];
-  for (const raw of lines) {
-    const line = raw.slice(cut).replace(/\t/g, '  ');
-    const text = line.trim();
-    if (!text) continue;
-    const heading = /^(#{1,3})\s+(.+)$/.exec(text);
-    if (heading) {
-      blocks.push({ type: 'h', level: heading[1].length, text: heading[2] });
-      stack.length = 0;
-      continue;
-    }
-    const item = /^(\s*)([-*+]|\d+[.)])\s+(.+)$/.exec(line);
-    if (!item) {
-      blocks.push({ type: 'p', text });
-      stack.length = 0;
-      continue;
-    }
-    const indent = item[1].length;
-    const ordered = /^\d/.test(item[2]);
-    while (stack.length && stack[stack.length - 1].indent >= indent) stack.pop();
-    const parent = stack.length ? stack[stack.length - 1].item : null;
-    const container = parent ? (parent.children ||= []) : blocks;
-    let list = container[container.length - 1];
-    if (!list || list.type !== 'list' || list.ordered !== ordered) {
-      list = { type: 'list', ordered, items: [] };
-      container.push(list);
-    }
-    const entry = { text: item[3] };
-    list.items.push(entry);
-    stack.push({ indent, item: entry });
-  }
-  return blocks;
+
+function archiveMonth(post) {
+  return /^\d{4}-(?:0[1-9]|1[0-2])-\d{2}$/.test(post.date) ? post.date.slice(0, 7) : '';
 }
-function markdownList(block) {
-  const list = document.createElement(block.ordered ? 'ol' : 'ul');
-  for (const item of block.items) {
-    const li = document.createElement('li');
-    li.append(inlineNodes(item.text));
-    if (item.children) for (const child of item.children) li.append(markdownList(child));
-    list.append(li);
-  }
-  return list;
+
+function archiveLabel(month) {
+  const [year, number] = month.split('-');
+  return year + ' 年 ' + Number(number) + ' 月';
 }
-function renderMarkdown(container, blocks) {
-  for (const block of blocks) {
-    if (block.type === 'list') {
-      container.append(markdownList(block));
-      continue;
-    }
-    if (block.type === 'h') {
-      const heading = document.createElement('h' + Math.min(block.level + 1, 4));
-      heading.append(inlineNodes(block.text));
-      container.append(heading);
-      continue;
-    }
-    const paragraph = document.createElement('p');
-    paragraph.append(inlineNodes(block.text));
-    container.append(paragraph);
-  }
+
+function dateLabel(post) {
+  return post.date || '日期待填写';
 }
+
+function readingTime(post) {
+  return '约 ' + BlogArticle.get(post).minutes + ' 分钟阅读';
+}
+
+function postLink(post, query) {
+  const params = new URLSearchParams({ id: post.id });
+  if (query) params.set('q', query);
+  return './post.html?' + params;
+}
+
+function filterLink(field, value) {
+  return './index.html?' + new URLSearchParams({ [field]: value }) + '#journal';
+}
+
 function animateCover() {
   const title = $('#cover-title');
   const text = title.textContent;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  if (motion.matches) return;
+  if (motion.matches || title.querySelector('mark')) return;
   const cover = $('.cover');
   const petals = $('.petals');
   for (let i = 0; i < 14; i++) {
@@ -136,80 +86,205 @@ function animateCover() {
 }
 
 function renderIndex() {
-  function render(term = '') {
-    const matches = posts.filter(p => [p.title,p.tag,p.summary,bodyText(p)].join(' ').toLowerCase().includes(term.trim().toLowerCase()));
-    $('#entries').replaceChildren(...matches.map(p => {
-      const a = document.createElement('a');
-      a.className = 'entry';
-      a.href = './post.html?id=' + encodeURIComponent(p.id);
-      a.append(element('small',p.tag),element('h3',p.title),element('p',p.summary),element('time',p.date || '日期待填写'));
-      return a;
-    }));
-    $('#empty').hidden = matches.length > 0;
-    const hits = $('#hits');
-    hits.replaceChildren();
-    if (term.trim()) {
-      for (const p of matches.slice(0, 5)) {
-        const link = element('a', p.title);
-        link.href = './post.html?id=' + encodeURIComponent(p.id);
-        hits.append(link);
-      }
-      if (!matches.length) hits.append(element('p', '没有匹配的文章'));
-    }
-    hits.hidden = !term.trim() || $('#query').hidden;
-  }
-  render();
-  const q = $('#query');
+  const query = $('#query');
   const search = $('.search');
   const find = $('#find');
+  const hits = $('#hits');
+  const params = new URLSearchParams(location.search);
+  const alphabetic = (a, b) => a.localeCompare(b, 'zh-CN');
+  const filters = [
+    { name: 'category', values: posts.map(category), includes: (post, value) => category(post) === value },
+    { name: 'tag', values: posts.flatMap(tags), includes: (post, value) => tags(post).includes(value) },
+    { name: 'archive', values: posts.map(archiveMonth), includes: (post, value) => archiveMonth(post) === value }
+  ];
+
+  for (const filter of filters) {
+    const select = $('#filter-' + filter.name);
+    const values = [...new Set(filter.values.filter(Boolean))];
+    if (filter.name === 'archive') values.sort().reverse();
+    else values.sort(alphabetic);
+    for (const value of values) {
+      select.add(new Option(filter.name === 'archive' ? archiveLabel(value) : value, value));
+    }
+    const selected = params.get(filter.name);
+    if (values.includes(selected)) select.value = selected;
+    filter.select = select;
+    select.addEventListener('change', render);
+  }
+  query.value = params.get('q') || '';
+
   function showSearch(open) {
-    q.hidden = !open;
-    $('#hits').hidden = !open || !q.value.trim();
+    query.hidden = !open;
+    hits.hidden = !open || !query.value.trim();
     find.setAttribute('aria-expanded', String(open));
   }
-  search.onpointerenter = e => {
-    if (e.pointerType === 'mouse') showSearch(true);
+
+  function saveFilters(term) {
+    const url = new URL(location.href);
+    for (const [key, value] of [['q', term], ...filters.map(filter => [filter.name, filter.select.value])]) {
+      if (value) url.searchParams.set(key, value);
+      else url.searchParams.delete(key);
+    }
+    if (url.href !== location.href && url.protocol !== 'file:') history.replaceState(null, '', url);
+  }
+
+  function entry(post, href, snippet) {
+    const link = element('a', '');
+    link.className = 'entry';
+    link.href = href;
+    const date = element('time', dateLabel(post));
+    if (post.date) date.dateTime = post.date;
+    const metadata = element('div', '');
+    metadata.className = 'entry-meta';
+    metadata.append(date, element('span', readingTime(post)));
+    link.append(
+      element('small', [category(post), ...tags(post)].join(' · ')),
+      element('h3', post.title),
+      element('p', snippet || post.summary || ''),
+      metadata
+    );
+    return link;
+  }
+
+  function render() {
+    const term = query.value.trim();
+    const pattern = BlogArticle.queryPattern(term);
+    const entries = [];
+    const suggestions = [];
+
+    for (const post of posts) {
+      if (!filters.every(filter => !filter.select.value || filter.includes(post, filter.select.value))) continue;
+      const bodyMatch = pattern && BlogArticle.find(post, pattern);
+      const otherMatch = pattern && [post.title, category(post), ...tags(post), post.summary]
+        .filter(Boolean).find(text => !text.matchAll(pattern).next().done);
+      if (pattern && !bodyMatch && !otherMatch) continue;
+
+      const href = postLink(post, term);
+      const card = entry(post, href, bodyMatch);
+      if (pattern) {
+        BlogArticle.highlight(card, pattern);
+        if (suggestions.length < 5) {
+          const suggestion = element('a', '');
+          suggestion.href = href;
+          suggestion.append(element('strong', post.title));
+          if (bodyMatch || otherMatch !== post.title) {
+            suggestion.append(element('small', bodyMatch || otherMatch));
+          }
+          BlogArticle.highlight(suggestion, pattern);
+          suggestions.push(suggestion);
+        }
+      }
+      entries.push(card);
+    }
+
+    $('#entries').replaceChildren(...entries);
+    $('#empty').hidden = entries.length > 0;
+    const searchSummary = $('#search-summary');
+    searchSummary.hidden = !term;
+    searchSummary.querySelector('span').textContent = term ? '“' + term + '” 的搜索结果' : '';
+    if (term && !suggestions.length) suggestions.push(element('p', '没有匹配的文章'));
+    hits.replaceChildren(...suggestions);
+    hits.hidden = !term || query.hidden;
+    saveFilters(term);
+  }
+
+  search.onpointerenter = event => {
+    if (event.pointerType === 'mouse') showSearch(true);
   };
-  search.onpointerleave = e => {
-    if (e.pointerType === 'mouse') showSearch(false);
+  search.onpointerleave = event => {
+    if (event.pointerType === 'mouse' && !search.matches(':focus-within')) showSearch(false);
   };
   find.onclick = () => {
-    q.hidden = false;
-    q.focus();
     showSearch(true);
+    query.focus();
   };
-  search.onfocusout = e => {
-    if (!search.contains(e.relatedTarget) && !search.matches(':hover')) showSearch(false);
+  search.onfocusout = event => {
+    if (!search.contains(event.relatedTarget) && !search.matches(':hover')) showSearch(false);
   };
-  document.addEventListener('pointerdown', e => {
-    if (!search.contains(e.target)) showSearch(false);
+  document.addEventListener('pointerdown', event => {
+    if (!search.contains(event.target)) showSearch(false);
   });
-  q.oninput = () => render(q.value);
-  q.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.isComposing) { showSearch(false); location.hash = 'journal'; $('#journal-title').focus({preventScroll:true}); }
+  query.addEventListener('input', render);
+  query.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.isComposing) return;
+    if (location.hash === '#journal') $('#journal').scrollIntoView();
+    else location.hash = 'journal';
+    $('#journal-title').focus({ preventScroll: true });
+    showSearch(false);
   });
-  search.onkeydown = e => {
-    if (e.key === 'Escape') {
-      q.value = '';
-      render();
-      showSearch(false);
-      find.focus();
-    }
+  function clearSearch() {
+    query.value = '';
+    render();
+    showSearch(false);
+  }
+  search.onkeydown = event => {
+    if (event.key !== 'Escape' || event.isComposing) return;
+    clearSearch();
+    find.focus();
   };
+  $('#clear-search').addEventListener('click', () => {
+    clearSearch();
+    $('#journal-title').focus({ preventScroll: true });
+  });
+  render();
 }
 
 function renderPost() {
-  const p = posts.find(item => item.id === new URLSearchParams(location.search).get('id'));
+  const params = new URLSearchParams(location.search);
+  const post = posts.find(item => item.id === params.get('id'));
   const article = $('#story article');
-  const title = p ? p.title : '找不到这篇文章';
+  const title = post ? post.title : '找不到这篇文章';
   $('#cover-title').textContent = title;
   document.title = title + " · Le1SurE7_7's Blog";
-  if (p) {
-    $('#post-meta').textContent = [p.tag, p.date || '日期待填写'].join('　·　');
-    if (p.markdown) renderMarkdown(article, parseMarkdown(p.markdown));
-    else article.append(...(p.paragraphs || []).map(t => element('p', t)));
-  } else {
+  if (!post) {
     article.append(element('p', '可以返回博客查看文章列表。'));
+    return;
+  }
+
+  $('#post-meta').textContent = [dateLabel(post), readingTime(post)].join('　·　');
+  const details = $('#article-details');
+  const info = [
+    ['category', category(post), '分类：'],
+    ...tags(post).map(tag => ['tag', tag, '标签：'])
+  ];
+  const month = archiveMonth(post);
+  if (month) info.push(['archive', month, '归档：']);
+  for (const [field, value, label] of info) {
+    const link = element('a', label + (field === 'archive' ? archiveLabel(value) : value));
+    link.href = filterLink(field, value);
+    details.append(link);
+  }
+  details.hidden = false;
+
+  BlogArticle.render(post, article, $('#contents'), $('#copy-status'));
+  const pattern = BlogArticle.queryPattern(params.get('q') || '');
+  let target;
+  if (pattern) {
+    target = BlogArticle.highlight(article, pattern) ||
+      BlogArticle.highlight($('#cover-title'), pattern) ||
+      BlogArticle.highlight(details, pattern);
+    if (!target && post.summary) {
+      const summary = element('p', post.summary);
+      target = BlogArticle.highlight(summary, pattern);
+      if (target) {
+        summary.className = 'search-context';
+        article.before(summary);
+      }
+    }
+  }
+  if (target) {
+    target.setAttribute('tabindex', '-1');
+    requestAnimationFrame(() => {
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
+    });
+  } else if (location.hash.startsWith('#heading-')) {
+    try {
+      const heading = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      requestAnimationFrame(() => heading?.scrollIntoView({ behavior: 'instant' }));
+    } catch {
+      // A malformed URL fragment has no target.
+    }
   }
 }
 

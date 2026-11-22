@@ -1,7 +1,7 @@
 # 本项目的 Codex 工作说明
 本项目是 GitHub Pages 个人博客。保留用户已有文章和资源。首页与文章页使用静态 HTML、CSS 和 JavaScript，从 main 分支根目录发布，所有站内链接使用相对路径。
 首页保留右上角站内搜索及介绍下方的文章列表。尊重减少动态效果设置。个人资料或文章尚未提供时标注「待填写」。
-文章正文与信息存放在 library/，一个文件一篇，content.js 的 libraryFiles 清单控制加载顺序；正文使用简易 Markdown（# 标题、- 与 1. 列表、**粗体**、*斜体*、~~删除线~~），渲染与搜索都在 app.js 中完成。
+文章正文与信息存放在 library/，一个文件一篇，content.js 的 libraryFiles 清单控制加载顺序；正文使用 Markdown，写法见 README.md。article.js 负责正文渲染、目录和匹配，app.js 负责页面交互。更新 Markdown 依赖时运行 npm run build:vendor，同步提交生成的 vendor/ 文件。
 编辑后检查桌面和手机布局、搜索、文章链接和资源路径。
 
 ## 共用主题和 emoji
