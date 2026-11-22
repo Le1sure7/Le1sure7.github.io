@@ -5,12 +5,16 @@
   --cover: url("wallpaper_day/desktop/Kanade_day.jpg");
   --paper: #faf8f8; --card: #fff; --ink: #302b39; --quiet: #665966;
   --line: #ddd5de; --accent: #79476d; --cover-position: center 48%;
+  --icon-surface: #fffffff0; --icon-surface-hover: #ffffff;
+  --icon-ink: #18191c; --icon-border: #c9ccd0;
   scroll-behavior: smooth;
 }
 :root[data-theme="night"] {
   color-scheme: dark; --cover: url("wallpaper_night/desktop/sola_night.jpg"); --cover-position: center 45%;
   --paper: #151521; --card: #201e30; --ink: #f5eef8; --quiet: #c4b7cb;
   --line: #443b50; --accent: #e1b9d5;
+  --icon-surface: #24262cf2; --icon-surface-hover: #2f323af2;
+  --icon-ink: #f4f5f7; --icon-border: #747782;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -36,7 +40,7 @@ h1,h2,h3 { font-family: var(--round); }
 .topbar { position: absolute; z-index: 5; inset: 0 0 auto; display: flex; justify-content: space-between; align-items: start; padding: 20px clamp(18px, 3vw, 50px); pointer-events: none; }
 .topbar > * { pointer-events: auto; }
 .menu, .search { position: relative; }
-.menu summary,.back,#find,#query { background: #211d35a6; color: #fff; border: 1px solid #fffa; }
+.menu summary,.back,#find,#query { background: var(--icon-surface); color: var(--icon-ink); border: 1px solid var(--icon-border); }
 .menu summary,.back { display: inline-flex; align-items: center; gap: 10px; padding: 5px 13px; font-size: .875rem; letter-spacing: .08em; border-radius: 4px; list-style: none; }
 summary::-webkit-details-marker { display: none; }
 .menu i { font-style: normal; }
@@ -67,10 +71,10 @@ summary::-webkit-details-marker { display: none; }
 .descend { position: absolute; bottom: max(24px,env(safe-area-inset-bottom)); display: grid; justify-items: center; gap: 6px; padding: 8px 14px; color: white; text-shadow: 0 1px 5px #1a132a; font-size: .9rem; }
 .shuffle-wallpaper {
   position: absolute; right: max(18px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom));
-  min-height: 44px; padding: 5px 16px; background: #211d35ad; color: white;
-  border: 1px solid #fffa; border-radius: 24px; font-size: .875rem;
+  min-height: 44px; padding: 5px 16px; background: var(--icon-surface); color: var(--icon-ink);
+  border: 1px solid var(--icon-border); border-radius: 24px; font-size: .875rem;
 }
-.shuffle-wallpaper:hover { background: #211d35e0; }
+.shuffle-wallpaper:hover { background: var(--icon-surface-hover); }
 @media (max-aspect-ratio: 5/4) {
   .cover-copy { left: 50%; top: 74%; width: 92%; }
 }
@@ -92,6 +96,12 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
 
 .reader { max-width: 760px; padding: 48px 0 100px; }
 .reader article { margin-top: 24px; font-size: 1.1rem; line-height: 1.95; }
+.reader article h2 { margin: 1.6em 0 .5em; font-family: var(--round); font-size: 1.45rem; line-height: 1.45; }
+.reader article ul, .reader article ol { margin: .6em 0; padding-inline-start: 1.6em; }
+.reader article li { margin: .35em 0; }
+.reader article li > ul, .reader article li > ol { margin: .3em 0 .2em; }
+.reader article em { font-style: italic; }
+.reader article del { opacity: .72; }
 @media (max-width: 760px) {
   .journal-layout { padding: 40px 0 75px; }
   .cover-copy { max-width: 96%; }
@@ -106,32 +116,24 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
 /* Shared navigation and locally bundled emoji artwork */
 .topbar { justify-content: flex-start; gap: 8px; }
 .topbar .menu { margin-right: auto; }
-.theme-toggle { width: 42px; height: 42px; flex: none; display: grid; place-items: center; padding: 0; border: 1px solid #fffa; border-radius: 50%; background: #211d35a6; }
+.theme-toggle { width: 42px; height: 42px; flex: none; display: grid; place-items: center; padding: 0; border: 1px solid var(--icon-border); border-radius: 50%; background: var(--icon-surface); }
 .emoji { display: inline-block; vertical-align: middle; object-fit: contain; }
 :root[data-theme="night"] .emoji { filter: invert(1); }
-.topbar #find, .topbar .theme-toggle, .topbar #query {
-  background: var(--icon-surface, #fffffff0);
-  color: var(--icon-ink, #18191c);
-  border-color: var(--icon-border, #c9ccd0);
-}
 .topbar #query::placeholder { color: inherit; opacity: .75; }
-:root[data-theme="night"] {
-  --icon-surface: #24262cf2;
-  --icon-ink: #f4f5f7;
-  --icon-border: #747782;
-}
 .topbar .emoji { width: 18px; height: 18px; }
 .menu-links button { width: 100%; text-align: left; padding: 6px 12px; background: transparent; font-size: 1rem; border: 0; border-top: 1px solid var(--line); }
 .menu-links button:disabled { color: var(--quiet); cursor: default; }
 @media (max-width: 380px) { #query { width: 34vw; } }
 
-/* Git logomark by Jason Long, https://git-scm.com/community/logos
-   Licensed under https://creativecommons.org/licenses/by/3.0/ */
+/* GitHub mark from the octicons set (MIT, https://github.com/primer/octicons).
+   Drawn with currentColor so the footer icon follows the day and night ink colours. */
 .github-profile {
   display: inline-grid;
   place-items: center;
   width: 32px;
   height: 32px;
   border-radius: 5px;
+  color: var(--quiet);
 }
-:root[data-theme="night"] .github-profile img { filter: brightness(0) invert(1); }
+.github-profile:hover { color: var(--accent); }
+.github-mark { display: block; }

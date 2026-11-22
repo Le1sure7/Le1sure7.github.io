@@ -4,6 +4,92 @@ function element(tag, text) {
   node.textContent = text;
   return node;
 }
+function bodyText(post) {
+  if (post.markdown) return post.markdown.replace(/[*~#>`]/g, ' ');
+  return (post.paragraphs || []).join(' ');
+}
+function inlineNodes(text) {
+  const fragment = document.createDocumentFragment();
+  const pattern = /\*\*\*([^*]+?)\*\*\*|\*\*([^*]+?)\*\*|\*([^*]+?)\*|~~([^~]+?)~~/g;
+  let cursor = 0;
+  let match;
+  while ((match = pattern.exec(text))) {
+    if (match.index > cursor) fragment.append(text.slice(cursor, match.index));
+    const [whole, boldItalic, bold, italic, strike] = match;
+    const wrap = document.createElement(boldItalic || bold ? 'strong' : italic ? 'em' : 'del');
+    const target = boldItalic ? wrap.appendChild(document.createElement('em')) : wrap;
+    target.append(inlineNodes(boldItalic ?? bold ?? italic ?? strike));
+    fragment.append(wrap);
+    cursor = pattern.lastIndex;
+  }
+  if (cursor < text.length) fragment.append(text.slice(cursor));
+  return fragment;
+}
+function parseMarkdown(source) {
+  const lines = source.replace(/\r\n?/g, '\n').split('\n');
+  const indents = lines.filter(line => line.trim()).map(line => /^ */.exec(line)[0].length);
+  const cut = indents.length ? Math.min(...indents) : 0;
+  const blocks = [];
+  const stack = [];
+  for (const raw of lines) {
+    const line = raw.slice(cut).replace(/\t/g, '  ');
+    const text = line.trim();
+    if (!text) continue;
+    const heading = /^(#{1,3})\s+(.+)$/.exec(text);
+    if (heading) {
+      blocks.push({ type: 'h', level: heading[1].length, text: heading[2] });
+      stack.length = 0;
+      continue;
+    }
+    const item = /^(\s*)([-*+]|\d+[.)])\s+(.+)$/.exec(line);
+    if (!item) {
+      blocks.push({ type: 'p', text });
+      stack.length = 0;
+      continue;
+    }
+    const indent = item[1].length;
+    const ordered = /^\d/.test(item[2]);
+    while (stack.length && stack[stack.length - 1].indent >= indent) stack.pop();
+    const parent = stack.length ? stack[stack.length - 1].item : null;
+    const container = parent ? (parent.children ||= []) : blocks;
+    let list = container[container.length - 1];
+    if (!list || list.type !== 'list' || list.ordered !== ordered) {
+      list = { type: 'list', ordered, items: [] };
+      container.push(list);
+    }
+    const entry = { text: item[3] };
+    list.items.push(entry);
+    stack.push({ indent, item: entry });
+  }
+  return blocks;
+}
+function markdownList(block) {
+  const list = document.createElement(block.ordered ? 'ol' : 'ul');
+  for (const item of block.items) {
+    const li = document.createElement('li');
+    li.append(inlineNodes(item.text));
+    if (item.children) for (const child of item.children) li.append(markdownList(child));
+    list.append(li);
+  }
+  return list;
+}
+function renderMarkdown(container, blocks) {
+  for (const block of blocks) {
+    if (block.type === 'list') {
+      container.append(markdownList(block));
+      continue;
+    }
+    if (block.type === 'h') {
+      const heading = document.createElement('h' + Math.min(block.level + 1, 4));
+      heading.append(inlineNodes(block.text));
+      container.append(heading);
+      continue;
+    }
+    const paragraph = document.createElement('p');
+    paragraph.append(inlineNodes(block.text));
+    container.append(paragraph);
+  }
+}
 function animateCover() {
   const title = $('#cover-title');
   const text = title.textContent;
@@ -49,9 +135,9 @@ function animateCover() {
   }
 }
 
-if ($('#entries')) {
+function renderIndex() {
   function render(term = '') {
-    const matches = posts.filter(p => [p.title,p.tag,p.summary,...p.paragraphs].join(' ').toLowerCase().includes(term.trim().toLowerCase()));
+    const matches = posts.filter(p => [p.title,p.tag,p.summary,bodyText(p)].join(' ').toLowerCase().includes(term.trim().toLowerCase()));
     $('#entries').replaceChildren(...matches.map(p => {
       const a = document.createElement('a');
       a.className = 'entry';
@@ -110,7 +196,9 @@ if ($('#entries')) {
       find.focus();
     }
   };
-} else {
+}
+
+function renderPost() {
   const p = posts.find(item => item.id === new URLSearchParams(location.search).get('id'));
   const article = $('#story article');
   const title = p ? p.title : '找不到这篇文章';
@@ -118,12 +206,19 @@ if ($('#entries')) {
   document.title = title + " · Le1SurE7_7's Blog";
   if (p) {
     $('#post-meta').textContent = [p.tag, p.date || '日期待填写'].join('　·　');
-    article.append(...p.paragraphs.map(t => element('p', t)));
+    if (p.markdown) renderMarkdown(article, parseMarkdown(p.markdown));
+    else article.append(...(p.paragraphs || []).map(t => element('p', t)));
   } else {
     article.append(element('p', '可以返回博客查看文章列表。'));
   }
 }
-animateCover();
+
+function start() {
+  if ($('#entries')) renderIndex();
+  else renderPost();
+  animateCover();
+}
+window.libraryReady.then(start);
 const menu = $('.menu');
 document.addEventListener('click', e => {
   if (!menu.contains(e.target) || e.target.closest('a')) menu.open = false;
