@@ -5,3 +5,4 @@ Source: https://www.bilibili.com/ (nav-search-btn, 17 × 17). Original path reta
 OpenMoji contributors: https://github.com/hfg-gmuend/openmoji/tree/15.1.0/black/svg
 The OpenMoji artwork and its adaptation use CC BY-SA 4.0:
 https://creativecommons.org/licenses/by-sa/4.0/ (LICENSE-GRAPHICS.txt).
+volume-mute.svg, volume-low.svg, volume-medium.svg and volume-high.svg — Project-drawn speaker icons with matching rounded strokes.

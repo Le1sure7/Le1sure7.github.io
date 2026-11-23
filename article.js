@@ -32,7 +32,16 @@ const BlogArticle = (() => {
   markdown.renderer.rules.image = (tokens, index, options, env, renderer) => {
     const token = tokens[index];
     const url = token.attrGet('src');
-    if (/\.(?:mp4|webm|ogv)$/i.test(url.split(/[?#]/, 1)[0]) && !/^data:/i.test(url)) {
+    const path = url.split(/[?#]/, 1)[0];
+    if (/^(?:\.\/)?media\/.+\.(?:flac|mp3|m4a|aac|wav|ogg|oga|opus|weba)$/i.test(path) &&
+        new URL(path, document.baseURI).href.startsWith(new URL('media/', document.baseURI).href)) {
+      const label = escape(renderer.renderInlineAsText(token.children, options, env) || '文章音频');
+      const source = escape(url);
+      return '<span class="article-audio"><span class="article-audio-title">' + label + '</span>' +
+        '<audio src="' + source + '" aria-label="' + label + '" controls preload="none" data-search-ignore>' +
+        '<a href="' + source + '">打开音频文件</a></audio></span>';
+    }
+    if (/\.(?:mp4|webm|ogv)$/i.test(path) && !/^data:/i.test(url)) {
       const label = escape(renderer.renderInlineAsText(token.children, options, env) || '文章视频');
       return '<video class="article-video" src="' + escape(url) + '" aria-label="' + label +
         '" controls playsinline preload="none"><a href="' + escape(url) + '">' + label + '</a></video>';

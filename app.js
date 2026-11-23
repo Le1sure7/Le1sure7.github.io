@@ -257,6 +257,7 @@ function renderPost() {
   details.hidden = false;
 
   BlogArticle.render(post, article, $('#contents'), $('#copy-status'));
+  MusicPlayer.mount(article, post.audio);
   const pattern = BlogArticle.queryPattern(params.get('q') || '');
   let target;
   if (pattern) {
