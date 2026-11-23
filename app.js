@@ -294,13 +294,60 @@ function enableCoverDescent() {
   const target = $(link.hash);
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
+  let startedByWheel = false;
 
-  function cancelDescent() {
-    cancelAnimationFrame(frame);
-    frame = 0;
+  function isDownwardWheel(event) {
+    return event.deltaY > Math.abs(event.deltaX) &&
+      !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey;
   }
 
-  for (const type of ['wheel', 'touchstart', 'pointerdown']) {
+  function handleWheelDuringDescent(event) {
+    if (event.defaultPrevented) return;
+    if (startedByWheel && event.cancelable && isDownwardWheel(event)) {
+      event.preventDefault();
+    } else {
+      cancelDescent();
+    }
+  }
+
+  function cancelDescent() {
+    if (!frame) return;
+    cancelAnimationFrame(frame);
+    frame = 0;
+    window.removeEventListener('wheel', handleWheelDuringDescent);
+  }
+
+  function descendToContent(event, fromWheel = false) {
+    const start = window.scrollY;
+    const scroller = document.scrollingElement;
+    const end = Math.min(start + target.getBoundingClientRect().top, scroller.scrollHeight - scroller.clientHeight);
+    const distance = end - start;
+    if (distance <= 0) return;
+
+    event.preventDefault();
+    cancelDescent();
+    startedByWheel = fromWheel;
+    if (!fromWheel && location.hash !== link.hash) history.pushState(history.state, '', link.hash);
+
+    const duration = Math.max(320, Math.min(680, distance * 0.6));
+    let startedAt;
+    function descend(now) {
+      startedAt ??= now;
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = progress ** 2 * (3 - 2 * progress);
+      window.scrollTo({ top: start + distance * eased, behavior: 'instant' });
+      if (progress === 1) {
+        cancelDescent();
+        if (!fromWheel) target.focus({ preventScroll: true });
+      } else {
+        frame = requestAnimationFrame(descend);
+      }
+    }
+    frame = requestAnimationFrame(descend);
+    window.addEventListener('wheel', handleWheelDuringDescent, { passive: false });
+  }
+
+  for (const type of ['touchstart', 'pointerdown']) {
     window.addEventListener(type, cancelDescent, { passive: true });
   }
   window.addEventListener('keydown', cancelDescent);
@@ -311,33 +358,13 @@ function enableCoverDescent() {
     const anchor = event.target.closest('a');
     if (anchor?.getAttribute('href') !== link.hash || event.defaultPrevented || event.button !== 0 ||
         event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || motion.matches) return;
-
-    const start = window.scrollY;
-    const scroller = document.scrollingElement;
-    const end = Math.min(start + target.getBoundingClientRect().top, scroller.scrollHeight - scroller.clientHeight);
-    const distance = end - start;
-    if (distance <= 0) return;
-
-    event.preventDefault();
-    cancelDescent();
-    if (location.hash !== link.hash) history.pushState(history.state, '', link.hash);
-
-    const duration = Math.max(320, Math.min(680, distance * 0.6));
-    let startedAt;
-    function descend(now) {
-      startedAt ??= now;
-      const progress = Math.min(1, (now - startedAt) / duration);
-      const eased = progress ** 2 * (3 - 2 * progress);
-      window.scrollTo({ top: start + distance * eased, behavior: 'instant' });
-      if (progress === 1) {
-        frame = 0;
-        target.focus({ preventScroll: true });
-      } else {
-        frame = requestAnimationFrame(descend);
-      }
-    }
-    frame = requestAnimationFrame(descend);
+    descendToContent(event);
   });
+
+  cover.addEventListener('wheel', event => {
+    if (frame || motion.matches || event.defaultPrevented || !event.cancelable || !isDownwardWheel(event)) return;
+    descendToContent(event, true);
+  }, { passive: false });
 }
 
 function start() {
