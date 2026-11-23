@@ -275,13 +275,17 @@ function renderPost() {
   if (target) {
     target.setAttribute('tabindex', '-1');
     requestAnimationFrame(() => {
+      cancelCoverDescent();
       target.focus({ preventScroll: true });
       target.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
     });
   } else if (location.hash.startsWith('#heading-')) {
     try {
       const heading = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-      requestAnimationFrame(() => heading?.scrollIntoView({ behavior: 'instant' }));
+      if (heading) requestAnimationFrame(() => {
+        cancelCoverDescent();
+        heading.scrollIntoView({ behavior: 'instant' });
+      });
     } catch {
       // A malformed URL fragment has no target.
     }
@@ -365,14 +369,16 @@ function enableCoverDescent() {
     if (frame || motion.matches || event.defaultPrevented || !event.cancelable || !isDownwardWheel(event)) return;
     descendToContent(event, true);
   }, { passive: false });
+
+  return cancelDescent;
 }
 
 function start() {
   if ($('#entries')) renderIndex();
   else renderPost();
   animateCover();
-  enableCoverDescent();
 }
+const cancelCoverDescent = enableCoverDescent();
 window.libraryReady.then(start);
 const menu = $('.menu');
 document.addEventListener('click', e => {

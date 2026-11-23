@@ -97,7 +97,7 @@ summary::-webkit-details-marker { display: none; }
 .entry small,.entry time { font-size: .9rem; }
 footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: .9rem; }
 
-.reader { max-width: 760px; padding: 48px 0 100px; }
+.reader { max-width: 760px; min-height: 100vh; min-height: 100svh; padding: 48px 0 100px; }
 .reader article { margin-top: 24px; font-size: 1.1rem; line-height: 1.95; }
 .reader article h2 { margin: 1.6em 0 .5em; font-family: var(--round); font-size: 1.45rem; line-height: 1.45; }
 .reader article ul, .reader article ol { margin: .6em 0; padding-inline-start: 1.6em; }
