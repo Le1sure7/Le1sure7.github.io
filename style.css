@@ -42,7 +42,9 @@ h1,h2,h3 { font-family: var(--round); }
 .topbar > * { pointer-events: auto; }
 .menu, .search { position: relative; }
 .menu summary,.back,#find,#query { background: var(--icon-surface); color: var(--icon-ink); border: 1px solid var(--icon-border); }
-.menu summary,.back { display: inline-flex; align-items: center; gap: 10px; padding: 5px 13px; font-size: .875rem; letter-spacing: .08em; border-radius: 4px; list-style: none; }
+.menu summary,.back { display: inline-flex; align-items: center; border-radius: 4px; list-style: none; }
+.menu summary { justify-content: center; width: 42px; height: 42px; font-size: 1.125rem; }
+.back { padding: 5px 13px; font-size: .875rem; letter-spacing: .08em; }
 summary::-webkit-details-marker { display: none; }
 .menu i { font-style: normal; }
 .menu-links,.hits { position: absolute; top: calc(100% + 4px); min-width: 132px; padding: 6px; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 20px #100f2a28; }
