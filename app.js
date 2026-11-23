@@ -288,10 +288,63 @@ function renderPost() {
   }
 }
 
+function enableCoverDescent() {
+  const cover = $('.cover');
+  const link = cover.querySelector('.descend');
+  const target = $(link.hash);
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let frame = 0;
+
+  function cancelDescent() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+  }
+
+  for (const type of ['wheel', 'touchstart', 'pointerdown']) {
+    window.addEventListener(type, cancelDescent, { passive: true });
+  }
+  window.addEventListener('keydown', cancelDescent);
+  window.addEventListener('popstate', cancelDescent);
+  motion.addEventListener('change', cancelDescent);
+
+  cover.addEventListener('click', event => {
+    const anchor = event.target.closest('a');
+    if (anchor?.getAttribute('href') !== link.hash || event.defaultPrevented || event.button !== 0 ||
+        event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || motion.matches) return;
+
+    const start = window.scrollY;
+    const scroller = document.scrollingElement;
+    const end = Math.min(start + target.getBoundingClientRect().top, scroller.scrollHeight - scroller.clientHeight);
+    const distance = end - start;
+    if (distance <= 0) return;
+
+    event.preventDefault();
+    cancelDescent();
+    if (location.hash !== link.hash) history.pushState(history.state, '', link.hash);
+
+    const duration = Math.max(320, Math.min(680, distance * 0.6));
+    let startedAt;
+    function descend(now) {
+      startedAt ??= now;
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = progress ** 2 * (3 - 2 * progress);
+      window.scrollTo({ top: start + distance * eased, behavior: 'instant' });
+      if (progress === 1) {
+        frame = 0;
+        target.focus({ preventScroll: true });
+      } else {
+        frame = requestAnimationFrame(descend);
+      }
+    }
+    frame = requestAnimationFrame(descend);
+  });
+}
+
 function start() {
   if ($('#entries')) renderIndex();
   else renderPost();
   animateCover();
+  enableCoverDescent();
 }
 window.libraryReady.then(start);
 const menu = $('.menu');
