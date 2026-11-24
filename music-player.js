@@ -243,6 +243,7 @@ const MusicPlayer = (() => {
     const minimumFullWidth = 220;
     const minimumFullHeight = 82;
     const margin = 8;
+    const hideThreshold = 1 / 5;
     const directions = new Map([
       ['ArrowLeft', [-1, 0]], ['ArrowRight', [1, 0]],
       ['ArrowUp', [0, -1]], ['ArrowDown', [0, 1]]
@@ -314,7 +315,7 @@ const MusicPlayer = (() => {
       if (dock.hidden) {
         pinned = false;
         reveal(false);
-      } else if (position) {
+      } else if (position && !gesture?.moved) {
         place(position.left, position.top);
       }
     }
@@ -387,6 +388,10 @@ const MusicPlayer = (() => {
         target: event.currentTarget, id: event.pointerId, kind, side,
         rect: dock.getBoundingClientRect(), x: event.clientX, y: event.clientY, moved: false
       };
+      if (event.pointerType === 'mouse') {
+        event.preventDefault();
+        if (kind === 'move') event.currentTarget.focus({ preventScroll: true });
+      }
       event.currentTarget.setPointerCapture(event.pointerId);
     }
 
@@ -420,11 +425,13 @@ const MusicPlayer = (() => {
       skipClick = target;
       if (dock.hidden) return;
       if (kind === 'move' && commit) {
-        const { left, right, top, bottom } = dock.getBoundingClientRect();
-        const overflow = [['left', -left], ['right', right - viewportWidth()],
-          ['top', -top], ['bottom', bottom - window.innerHeight]];
-        const [side, distance] = overflow.reduce((largest, current) => current[1] > largest[1] ? current : largest);
-        if (distance > 12) setEdge(side);
+        const { left, right, top, bottom, width, height } = dock.getBoundingClientRect();
+        const overflow = [
+          ['left', -left / width], ['right', (right - viewportWidth()) / width],
+          ['top', -top / height], ['bottom', (bottom - window.innerHeight) / height]
+        ];
+        const [side, fraction] = overflow.reduce((largest, current) => current[1] > largest[1] ? current : largest);
+        if (fraction > hideThreshold) setEdge(side);
       }
       keepInView();
     }

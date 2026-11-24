@@ -328,10 +328,13 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
 .music-details { color: var(--quiet); font-size: .85rem; }
 .music-seek, .music-volume input { min-width: 0; margin: 0; accent-color: var(--accent); }
 .music-seek { width: 100%; min-height: 24px; }
-.music-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: .4rem; }
+.music-controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(min-content, 12.8rem) minmax(2rem, 1fr); align-items: center; gap: .4rem; }
 .music-time, .music-timestamps { display: flex; align-items: center; gap: .42rem; }
-.music-time { grid-column: 2; color: var(--quiet); font-size: .75rem; font-variant-numeric: tabular-nums; }
-.music-timestamps { white-space: nowrap; }
+.music-time { grid-column: 2; justify-content: space-between; color: var(--quiet); font-size: .75rem; font-variant-numeric: tabular-nums; }
+.music-timestamps { justify-content: center; width: 6rem; white-space: nowrap; }
+@media (max-width: 520px) {
+  .music-timestamps { width: auto; }
+}
 .music-timestamps span + span::before { content: "/"; margin-inline-end: .42rem; }
 .music-volume { position: relative; justify-self: end; display: inline-flex; }
 .music-volume-trigger, .music-mute {
@@ -504,7 +507,7 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
   }
 }
 .music-dock {
-  transition: translate .2s ease;
+  transition: translate .2s ease, left .2s ease, top .2s ease;
 }
 .music-dock[data-dragging] { transition: none; }
 .music-dock[data-tucked] { pointer-events: none; box-shadow: none; }
@@ -556,8 +559,14 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
   color: var(--quiet);
   box-shadow: 0 .25rem .85rem color-mix(in srgb, var(--ink) 18%, transparent);
 }
-.music-edge-tab[aria-expanded="true"] { z-index: 7; }
 .music-edge-tab:hover { background: var(--icon-surface-hover); }
+.music-edge-tab[aria-expanded="true"] {
+  z-index: 7;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.music-edge-tab[aria-expanded="true"]::after { content: none; }
 .music-edge-tab[data-edge="left"] { top: var(--edge-offset); left: -3px; }
 .music-edge-tab[data-edge="right"] { top: var(--edge-offset); right: -3px; }
 .music-edge-tab:is([data-edge="top"], [data-edge="bottom"]) {
