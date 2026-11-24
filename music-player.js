@@ -521,6 +521,7 @@ const MusicPlayer = (() => {
       dock.dataset.playing = playing;
       setPlayback(floatingCover, playing, title);
       const currentLine = lyrics?.lines[lyrics.index];
+      dock.toggleAttribute('data-has-lyrics', Boolean(currentLine));
       const translation = currentLine?.translation || '';
       const translationVisibilityChanged = dockTranslation.hidden === Boolean(translation);
       dockDetail.textContent = currentLine?.text || details || formatTime(audio.currentTime);

@@ -389,3 +389,27 @@ menu.addEventListener('keydown', e => {
   if (e.key === 'Escape') { menu.open = false; menu.querySelector('summary').focus(); }
 });
 
+const refreshButton = menu.querySelector('[data-force-refresh]');
+refreshButton?.addEventListener('click', async () => {
+  refreshButton.disabled = true;
+  refreshButton.textContent = '正在刷新…';
+
+  if (location.protocol === 'https:' || location.protocol === 'http:') {
+    const resources = new Set([location.href]);
+    for (const node of document.querySelectorAll('script[src], link[rel~="stylesheet"][href]')) {
+      resources.add(node.src || node.href);
+    }
+    for (const entry of performance.getEntriesByType('resource')) {
+      if (entry.initiatorType === 'img' || entry.initiatorType === 'css') resources.add(entry.name);
+    }
+
+    const options = { cache: 'reload', signal: AbortSignal.timeout(5000) };
+    const localResources = [...resources].filter(url => new URL(url).origin === location.origin);
+    await Promise.allSettled(localResources.map(async url => {
+      const response = await fetch(url, options);
+      await response.arrayBuffer();
+    }));
+  }
+
+  location.reload();
+});
