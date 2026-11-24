@@ -556,13 +556,18 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
 .music-resize-edge[data-resize-edge="bottom"] { bottom: -6px; }
 .music-resize-edge[data-resize-edge="left"] { left: -6px; }
 .music-edge-tab {
+  --tab-depth: 15px;
+  --tab-length: 48px;
+  --tab-inset: -3px;
   position: fixed;
   z-index: 9;
   display: grid;
   place-items: center;
-  width: 15px;
-  height: 48px;
+  width: var(--tab-depth);
+  height: var(--tab-length);
   padding: 0;
+  touch-action: none;
+  user-select: none;
   border: 1px solid var(--icon-border);
   border-radius: .45rem;
   background: var(--icon-surface);
@@ -577,15 +582,15 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
   box-shadow: none;
 }
 .music-edge-tab[aria-expanded="true"]::after { content: none; }
-.music-edge-tab[data-edge="left"] { top: var(--edge-offset); left: -3px; }
-.music-edge-tab[data-edge="right"] { top: var(--edge-offset); right: -3px; }
+.music-edge-tab[data-edge="left"] { top: var(--edge-offset); left: var(--tab-inset); }
+.music-edge-tab[data-edge="right"] { top: var(--edge-offset); right: var(--tab-inset); }
 .music-edge-tab:is([data-edge="top"], [data-edge="bottom"]) {
   left: var(--edge-offset);
-  width: 48px;
-  height: 15px;
+  width: var(--tab-length);
+  height: var(--tab-depth);
 }
-.music-edge-tab[data-edge="top"] { top: -3px; }
-.music-edge-tab[data-edge="bottom"] { bottom: -3px; }
+.music-edge-tab[data-edge="top"] { top: var(--tab-inset); }
+.music-edge-tab[data-edge="bottom"] { bottom: var(--tab-inset); }
 .music-edge-tab::after {
   width: 5px;
   height: 5px;
@@ -597,6 +602,10 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
 .music-edge-tab[data-edge="right"]::after { transform: rotate(225deg); }
 .music-edge-tab[data-edge="top"]::after { transform: rotate(135deg); }
 .music-edge-tab[data-edge="bottom"]::after { transform: rotate(-45deg); }
+@media (pointer: coarse) {
+  .music-edge-tab { --tab-depth: 40px; --tab-length: 72px; --tab-inset: 0px; }
+  .music-edge-tab::after { width: 8px; height: 8px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .music-disc { animation: none; }
   .music-cover-overlay, .music-dock, .music-line-time { transition: none; }

@@ -286,6 +286,8 @@ const MusicPlayer = (() => {
     const minimumFullHeight = 82;
     const margin = 8;
     const hideThreshold = 1 / 5;
+    const pullThreshold = 10;
+    const inward = { left: [1, 0], right: [-1, 0], top: [0, 1], bottom: [0, -1] };
     const directions = new Map([
       ['ArrowLeft', [-1, 0]], ['ArrowRight', [1, 0]],
       ['ArrowUp', [0, -1]], ['ArrowDown', [0, 1]]
@@ -329,26 +331,29 @@ const MusicPlayer = (() => {
       const limitY = Math.max(0, window.innerHeight - height);
       const gapX = Math.min(margin, limitX / 2);
       const gapY = Math.min(margin, limitY / 2);
+      const alignedEdge = gesture?.kind === 'pull' && gesture.moved ? '' : edge;
       if (allowOverflow) {
         left = clamp(left, 22 - width, viewport - 22);
         top = clamp(top, 22 - height, window.innerHeight - 22);
       } else {
         left = clamp(left, gapX, limitX - gapX);
         top = clamp(top, gapY, limitY - gapY);
-        if (edge === 'left') left = gapX;
-        if (edge === 'right') left = limitX - gapX;
-        if (edge === 'top') top = gapY;
-        if (edge === 'bottom') top = limitY - gapY;
+        if (alignedEdge === 'left') left = gapX;
+        if (alignedEdge === 'right') left = limitX - gapX;
+        if (alignedEdge === 'top') top = gapY;
+        if (alignedEdge === 'bottom') top = limitY - gapY;
       }
       position = { left, top };
       dock.style.setProperty('--dock-left', left + 'px');
       dock.style.setProperty('--dock-top', top + 'px');
       dock.dataset.positioned = '';
-      if (edge) {
-        const side = edge === 'left' || edge === 'right';
+      if (alignedEdge) {
+        const side = alignedEdge === 'left' || alignedEdge === 'right';
         const center = side ? top + height / 2 : left + width / 2;
         const limit = side ? window.innerHeight : viewport;
-        tab.style.setProperty('--edge-offset', clamp(center - 24, margin, limit - 48 - margin) + 'px');
+        const length = side ? tab.offsetHeight : tab.offsetWidth;
+        const gap = Math.min(margin, Math.max(0, (limit - length) / 2));
+        tab.style.setProperty('--edge-offset', clamp(center - length / 2, gap, limit - length - gap) + 'px');
       }
     }
 
@@ -407,13 +412,21 @@ const MusicPlayer = (() => {
         }
       });
     }
+    function toggleTab(focusCover) {
+      pinned = !pinned;
+      reveal(pinned);
+      if (pinned && focusCover) cover.focus({ preventScroll: true });
+    }
+
     tab.addEventListener('click', event => {
+      if (event.detail && skipClick === tab) {
+        skipClick = undefined;
+        return;
+      }
       if (event.pointerType === 'mouse') {
         reveal(true);
       } else {
-        pinned = !pinned;
-        reveal(pinned);
-        if (pinned && event.detail === 0) cover.focus({ preventScroll: true });
+        toggleTab(event.detail === 0);
       }
     });
     document.addEventListener('pointerdown', event => {
@@ -428,7 +441,8 @@ const MusicPlayer = (() => {
       skipClick = undefined;
       gesture = {
         target: event.currentTarget, id: event.pointerId, kind, side,
-        rect: dock.getBoundingClientRect(), x: event.clientX, y: event.clientY, moved: false
+        rect: kind === 'pull' ? position : dock.getBoundingClientRect(),
+        x: event.clientX, y: event.clientY, moved: false
       };
       if (event.pointerType === 'mouse') {
         event.preventDefault();
@@ -441,32 +455,50 @@ const MusicPlayer = (() => {
       if (gesture?.id !== event.pointerId || dock.hidden) return;
       const dx = event.clientX - gesture.x;
       const dy = event.clientY - gesture.y;
+      const { kind, rect, side } = gesture;
       if (!gesture.moved) {
-        if (Math.hypot(dx, dy) < 5) return;
+        if (kind === 'pull') {
+          if (Math.hypot(dx, dy) < pullThreshold) return;
+          gesture.swiped = true;
+          const [x, y] = inward[side];
+          if (dx * x + dy * y < pullThreshold) return;
+        } else if (Math.hypot(dx, dy) < 5) return;
         gesture.moved = true;
         dock.dataset.dragging = '';
-        if (gesture.kind === 'move' && edge) setEdge('');
+        if (kind === 'move' && edge) setEdge('');
+        // Keep the tab available for pointer capture until the pull ends.
+        if (kind === 'pull') reveal(true);
       }
-      const { rect, side } = gesture;
-      if (gesture.kind === 'resize') {
+      if (kind === 'resize') {
         const vertical = side === 'top' || side === 'bottom';
         const fromStart = side === 'left' || side === 'top';
         const delta = (vertical ? dy : dx) * (fromStart ? -1 : 1);
         resize((vertical ? rect.height : rect.width) + delta, side, rect);
       } else {
-        place(rect.left + dx, rect.top + dy, true);
+        place(rect.left + dx, rect.top + dy, kind === 'move');
       }
     }
 
     function finish(event, commit) {
       if (gesture?.id !== event.pointerId) return;
-      const { moved, target, kind } = gesture;
+      const { moved, swiped, target, kind, rect, x, y } = gesture;
       gesture = undefined;
       delete dock.dataset.dragging;
-      if (!moved) return;
-      skipClick = target;
+      if (moved || (kind === 'pull' && commit)) skipClick = target;
       if (dock.hidden) return;
-      if (kind === 'move' && commit) {
+      if (!moved) {
+        if (kind === 'pull' && commit && !swiped && Math.hypot(event.clientX - x, event.clientY - y) < pullThreshold) {
+          toggleTab(false);
+        }
+        return;
+      }
+      if (kind === 'pull') {
+        if (commit) setEdge('');
+        else {
+          reveal(pinned);
+          place(rect.left, rect.top);
+        }
+      } else if (kind === 'move' && commit) {
         const { left, right, top, bottom, width, height } = dock.getBoundingClientRect();
         const overflow = [
           ['left', -left / width], ['right', (right - viewportWidth()) / width],
@@ -482,12 +514,20 @@ const MusicPlayer = (() => {
     cover.addEventListener('pointerdown', event => {
       if (compact()) start(event, 'move');
     });
+    tab.addEventListener('pointerdown', event => {
+      if (event.pointerType === 'mouse') {
+        if (skipClick === tab) skipClick = undefined;
+      } else if (edge) {
+        start(event, 'pull', edge);
+      }
+    });
     for (const bar of resizeEdges) {
       bar.addEventListener('pointerdown', event => start(event, 'resize', bar.dataset.resizeEdge));
     }
-    for (const target of [handle, cover, ...resizeEdges]) {
+    for (const target of [handle, cover, tab, ...resizeEdges]) {
       target.addEventListener('pointermove', move);
       target.addEventListener('pointerup', event => finish(event, true));
+      target.addEventListener('pointercancel', event => finish(event, false));
       target.addEventListener('lostpointercapture', event => finish(event, false));
     }
     dock.addEventListener('click', event => {
