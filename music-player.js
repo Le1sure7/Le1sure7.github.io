@@ -1,5 +1,18 @@
 const MusicPlayer = (() => {
-  const defaultVolume = 0.5;
+  const defaultVolume = 0.3;
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  let useNativeVolume = !AudioContext || !/^https?:$/.test(location.protocol);
+  let audioContext;
+
+  if (!useNativeVolume) {
+    // Some mobile browsers briefly report the assigned volume without applying it.
+    const probe = new Audio();
+    probe.addEventListener('volumechange', () => {
+      useNativeVolume = probe.volume === defaultVolume;
+    }, { once: true });
+    probe.volume = defaultVolume;
+  }
+
   const playIcon = '<span class="music-play-icon" aria-hidden="true"></span>';
   const coverButton = '<button type="button" class="music-cover" data-search-ignore>' +
     '<span class="music-disc" aria-hidden="true"><img alt="" hidden></span>' +
@@ -53,6 +66,40 @@ const MusicPlayer = (() => {
     button.dataset.playing = playing;
   }
 
+  function createVolumeOutput(audio) {
+    let level = defaultVolume;
+    let gain;
+    audio.volume = level;
+
+    function syncGain() {
+      gain.gain.value = audio.muted ? 0 : level;
+    }
+
+    return {
+      get value() { return gain || !useNativeVolume ? level : audio.volume; },
+      set(value, muted = false) {
+        level = value;
+        if (!gain) audio.volume = value;
+        audio.muted = muted;
+        if (gain) syncGain();
+      },
+      prepare() {
+        if (!gain && useNativeVolume) return;
+        audioContext ??= new AudioContext();
+        if (!gain) {
+          const node = audioContext.createGain();
+          node.gain.value = audio.muted ? 0 : level;
+          node.connect(audioContext.destination);
+          audioContext.createMediaElementSource(audio).connect(node);
+          gain = node;
+          audio.volume = 1;
+          audio.addEventListener('volumechange', syncGain);
+        }
+        if (audioContext.state !== 'running') return audioContext.resume();
+      }
+    };
+  }
+
   function bindVolume(root, getTrack) {
     const trigger = root.querySelector('.music-volume-trigger');
     const panel = root.querySelector('.music-volume-panel');
@@ -64,8 +111,8 @@ const MusicPlayer = (() => {
     function update() {
       const track = getTrack();
       if (!track) return;
-      const { audio } = track;
-      const value = audio.muted ? 0 : audio.volume;
+      const { audio, output } = track;
+      const value = audio.muted ? 0 : output.value;
       const level = value === 0 ? 'mute' : value <= 1 / 3 ? 'low' : value <= 2 / 3 ? 'medium' : 'high';
       const label = Math.round(value * 100) + '%';
       if (root.dataset.level !== level) {
@@ -82,14 +129,10 @@ const MusicPlayer = (() => {
     function toggleMute() {
       const track = getTrack();
       if (!track) return;
-      const { audio } = track;
-      if (audio.muted || audio.volume === 0) {
-        if (audio.volume === 0) audio.volume = track.lastVolume;
-        audio.muted = false;
-      } else {
-        audio.muted = true;
-      }
-      update();
+      const { audio, output } = track;
+      const value = output.value;
+      output.set(value || track.lastVolume, !audio.muted && value > 0);
+      track.syncVolume();
     }
 
     function positionPanel() {
@@ -165,9 +208,8 @@ const MusicPlayer = (() => {
       if (!track) return;
       const value = Number(input.value);
       if (value > 0) track.lastVolume = value;
-      track.audio.volume = value;
-      track.audio.muted = false;
-      update();
+      track.output.set(value);
+      track.syncVolume();
     });
     return { update, close: () => setOpen(false) };
   }
@@ -538,6 +580,7 @@ const MusicPlayer = (() => {
 
     for (const player of players) {
       const audio = player.querySelector('audio');
+      const output = createVolumeOutput(audio);
       const titleNode = player.querySelector('.article-audio-title');
       const title = titleNode.textContent;
       const track = settings.get(audio.src) || {};
@@ -593,6 +636,11 @@ const MusicPlayer = (() => {
         syncProgress();
       }
 
+      function syncVolume() {
+        volume.update();
+        if (active === state) dockVolume.update();
+      }
+
       async function toggle() {
         if (!audio.paused && !audio.ended) {
           audio.pause();
@@ -600,7 +648,8 @@ const MusicPlayer = (() => {
         }
         status.hidden = true;
         try {
-          await audio.play();
+          const ready = output.prepare();
+          await Promise.all([audio.play(), ready]);
         } catch (error) {
           if (error.name !== 'AbortError') {
             status.textContent = '无法播放此音频';
@@ -610,20 +659,16 @@ const MusicPlayer = (() => {
       }
 
       const state = {
-        player, audio, cover, title, details, lyrics, artwork: track.cover,
-        visible: true, lastVolume: defaultVolume, toggle
+        player, audio, output, cover, title, details, lyrics, artwork: track.cover,
+        visible: true, lastVolume: defaultVolume, toggle, syncVolume
       };
       states.set(player, state);
       observer.observe(player);
       cover.addEventListener('click', toggle);
       playButton.addEventListener('click', toggle);
       seek.addEventListener('input', () => seekTo(Number(seek.value)));
-      audio.volume = defaultVolume;
-      volume.update();
-      audio.addEventListener('volumechange', () => {
-        volume.update();
-        if (active === state) dockVolume.update();
-      });
+      syncVolume();
+      audio.addEventListener('volumechange', syncVolume);
       audio.addEventListener('play', () => {
         const previous = active;
         active = state;

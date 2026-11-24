@@ -41,7 +41,7 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false,
+                "autoReveal": true,
                 "showSearch": false,
                 "searchQuery": ""
               },
@@ -186,7 +186,7 @@
       "bases:新建数据库": false
     }
   },
-  "active": "c4b9bcd880c6690d",
+  "active": "9fcf2834967e3134",
   "lastOpenFiles": [
     "fil... - 最近听到感觉不错的音乐.md",
     "file:E:/WebPage/AGENTS.md",

@@ -33,11 +33,14 @@ function readingTime(post) {
 function postLink(post, query) {
   const params = new URLSearchParams({ id: post.id });
   if (query) params.set('q', query);
+  if (siteVersion) params.set('v', siteVersion);
   return './post.html?' + params;
 }
 
 function filterLink(field, value) {
-  return './index.html?' + new URLSearchParams({ [field]: value }) + '#journal';
+  const params = new URLSearchParams({ [field]: value });
+  if (siteVersion) params.set('v', siteVersion);
+  return './index.html?' + params + '#journal';
 }
 
 function animateCover() {
