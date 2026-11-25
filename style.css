@@ -1,6 +1,5 @@
 :root {
   color-scheme: light;
-  --round: Calibri, "YouYuan", "幼圆", "Yuanti SC", "Microsoft YaHei", sans-serif;
   --body: Calibri, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
   --cover: url("wallpaper_day/desktop/Kanade_day.jpg");
   --paper: #faf8f8; --card: #fff; --ink: #302b39; --quiet: #665966;
@@ -27,7 +26,7 @@ button, summary { cursor: pointer; }
 :focus-visible { outline: 3px solid #df9ecf; outline-offset: 3px; }
 main[tabindex="-1"]:focus { outline: none; }
 h1,h2,h3 {
-  font-family: var(--round);
+  font-family: var(--body);
   font-synthesis: none;
 }
 .cover {
@@ -113,7 +112,7 @@ footer { display: flex; align-items: center; border-top: 1px solid var(--line); 
   padding: 48px 0 100px;
 }
 .reader article { margin-top: 24px; font-size: 1.1rem; line-height: 1.95; }
-.reader article h2 { margin: 1.6em 0 .5em; font-family: var(--round); font-size: 1.45rem; line-height: 1.45; }
+.reader article h2 { margin: 1.6em 0 .5em; font-size: 1.45rem; line-height: 1.45; }
 .reader article ul, .reader article ol { margin: .6em 0; padding-inline-start: 1.6em; }
 .reader article li { margin: .35em 0; }
 .reader article li > ul, .reader article li > ol { margin: .3em 0 .2em; }
