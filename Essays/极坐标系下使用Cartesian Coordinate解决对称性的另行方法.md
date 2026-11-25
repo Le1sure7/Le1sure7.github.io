@@ -1,8 +1,8 @@
-# 课本中对极坐标系下的定义如下：
+# 课本中对极坐标系下的定义如下
 
 （原谅我懒得做图吧）
 
-> ##### **Symmetry Tests for Polar Graphs in the Cartesian xy-Plane**
+> ## **Symmetry Tests for Polar Graphs in the Cartesian xy-Plane**
 > 1. Symmetry about the **x-axis**: If the point **(r, θ)** lies on the graph, then the point **(r, −θ) or (−r, π − θ)** lies on the graph (Figure a).
 > 2. Symmetry about the **y-axis**: If the point **(r, θ)** lies on the graph, then the point **(r, π − θ) or (−r, −θ)** lies on the graph (Figure b).
 > 3. Symmetry about the **origin**: If the point **(r, θ)** lies on the graph, then the point **(−r, θ) or (r, θ + π)** lies on the graph (Figure c).
@@ -10,12 +10,12 @@
 
 
 
-# 例题（Thomas’ Calculus §10.4 第 7 题）：
+# 例题（Thomas’ Calculus §10.4 第 7 题）
 
 ***Identify the symmetries of the below curve:***
 **$$r = sin(θ/2)$$**
 
-## 常规解法：
+## 常规解法
 
 （可能详细了些，因为我是蒻蒟）
 
@@ -60,7 +60,7 @@ $$
 ![[Pasted image 20261125230009.png|368]]
 
 
-## 另行方法，如下：
+## 另行方法
 
 先让我们画出 $θ - r$ 的函数图像吧。
 ![[Pasted image 20261125230410.png|669]]
@@ -77,7 +77,7 @@ $$
 （感觉我的文笔有表达这个做法有点费劲了 **(T_T)** )。
 但是相信聪明的读者已经能从这题举一反三了。 (´・ω・`)
 
-# More Conditions:
+# More Conditions
 
 那么就让AI大人为我们梳理下各种情况吧（：
 
@@ -94,7 +94,7 @@ $$
 
 当然这么多我也背不下来，其实事实上，你只要想象成将 $\theta$ 轴在 $O$ 点处像卷棉花糖一样卷起来（为了使正方向与Polar Coordinate统一， $\theta$ 轴正方向可能要改变下，同样的若是负的，你在想象是加个对称罢）就行。（饿了，属于是）
 
-## 冒昧地用标题写些闲话把：
+## 冒昧地用标题写些闲话把
 
 物理期中今天发下来了，虽然只有80多吧，但也感觉愧疚又开心吧，助教老师捞的太好了，万分感激。至少期中考试所有内容基本都是考前一天大半夜临时抱佛脚的，看到最后几张直接烦了，随便看了下就睡觉了（笑哭）。至于之前上课干啥去了，我也不知道，哈哈。
 
