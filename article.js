@@ -198,9 +198,10 @@ const BlogArticle = (() => {
     return first;
   }
 
-  function renderContents(article, contents) {
+  function renderContents(article, contents, maxLevel = 6) {
     const ids = new Set();
-    const headings = [...article.querySelectorAll('[data-heading-level]')];
+    const headings = [...article.querySelectorAll('[data-heading-level]')]
+      .filter(heading => Number(heading.dataset.headingLevel) <= maxLevel);
     if (!headings.length) return;
     const firstLevel = Math.min(...headings.map(heading => Number(heading.dataset.headingLevel)));
     const list = contents.querySelector('ol');
@@ -286,7 +287,7 @@ const BlogArticle = (() => {
 
   function render(post, article, contents, status) {
     article.append(get(post).template.content.cloneNode(true));
-    renderContents(article, contents);
+    renderContents(article, contents, post.contentsDepth);
     addCodeCopy(article, status);
     addAnimations(article);
   }

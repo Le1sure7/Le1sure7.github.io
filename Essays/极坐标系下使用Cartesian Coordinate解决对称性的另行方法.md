@@ -1,4 +1,7 @@
-# 课本中对极坐标系下的定义如下：（原谅我懒得做图吧）
+# 课本中对极坐标系下的定义如下：
+
+（原谅我懒得做图吧）
+
 > ##### **Symmetry Tests for Polar Graphs in the Cartesian xy-Plane**
 > 1. Symmetry about the **x-axis**: If the point **(r, θ)** lies on the graph, then the point **(r, −θ) or (−r, π − θ)** lies on the graph (Figure a).
 > 2. Symmetry about the **y-axis**: If the point **(r, θ)** lies on the graph, then the point **(r, π − θ) or (−r, −θ)** lies on the graph (Figure b).
@@ -7,20 +10,22 @@
 
 
 
-# 现在看一下这题（Thomas’ Calculus §10.4 第 7 题）：
+# 例题（Thomas’ Calculus §10.4 第 7 题）：
 
 ***Identify the symmetries of the below curve:***
 **$$r = sin(θ/2)$$**
 
-### 常规的解法（可能详细了些，因为我是蒻蒟）：
+## 常规解法：
+
+（可能详细了些，因为我是蒻蒟）
 
 曲线 $r=\sin(\theta/2)$ 关于 $x$ 轴、$y$ 轴和极点都对称。
 
 极坐标对应的直角坐标为 $x=r\cos\theta$、$y=r\sin\theta$。注意 $\sin(\theta/2)$ 的周期是 $4\pi$，所以 $\theta$ 增加 $2\pi$ 时，角度指向相同，但方程给出的 $r$ 会变号。
 
-##### 关于 $x$ 轴对称
+### 关于 $x$ 轴对称
 
-取 $\theta'=2\pi-\theta$。它与 $-\theta$ 指向相同，而且
+	取 $\theta'=2\pi-\theta$。它与 $-\theta$ 指向相同，而且
 
 $$
 r'=\sin\left(\frac{2\pi-\theta}{2}\right)
@@ -29,7 +34,7 @@ $$
 
 所以 $(x',y')=(x,-y)$，即关于 $x$ 轴的镜像点也在曲线上。
 
-##### 关于 $y$ 轴对称
+### 关于 $y$ 轴对称
 
 取 $\theta'=-\theta$，则
 
@@ -37,7 +42,7 @@ $$
 r'=\sin\left(-\frac{\theta}{2}\right)=-r.
 $$
 
-##### 因此
+### 因此
 
 $$
 (x',y')
@@ -47,11 +52,11 @@ $$
 
 直观上，角度取负先把 $(x,y)$ 变成 $(x,-y)$，半径取负再把两个坐标都变号，最后得到 $(-x,y)$。
 
-##### 关于极点对称
+### 关于极点对称
 
 取 $\theta'=\theta+2\pi$。角度指向相同，但 $r'=\sin(\theta/2+\pi)=-r$，所以 $(x',y')=(-x,-y)$。也可以把关于 $x$ 轴和 $y$ 轴的两次反射接起来，得到同一个结论。
 
-##### 为了方便观测，在这里给出函数图像
+### 为了方便观测，在这里给出函数图像
 ![[Pasted image 20261125230009.png|368]]
 
 
@@ -89,7 +94,7 @@ $$
 
 当然这么多我也背不下来，其实事实上，你只要想象成将 $\theta$ 轴在 $O$ 点处像卷棉花糖一样卷起来（为了使正方向与Polar Coordinate统一， $\theta$ 轴正方向可能要改变下，同样的若是负的，你在想象是加个对称罢）就行。（饿了，属于是）
 
-###### 冒昧的使用六级标题写些闲话把：
+## 冒昧地用标题写些闲话把：
 
 物理期中今天发下来了，虽然只有80多吧，但也感觉愧疚又开心吧，助教老师捞的太好了，万分感激。至少期中考试所有内容基本都是考前一天大半夜临时抱佛脚的，看到最后几张直接烦了，随便看了下就睡觉了（笑哭）。至于之前上课干啥去了，我也不知道，哈哈。
 
