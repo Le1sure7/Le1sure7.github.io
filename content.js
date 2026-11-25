@@ -2,7 +2,7 @@
 // 新增文章：先写好 library/文件名.js（照抄 first-blog.js 的写法），
 // 再把文件名（不含 .js）登记到下面清单里，越靠前越新。
 const posts = [];
-const libraryFiles = ['fil-music', 'first-blog'];
+const libraryFiles = ['polar-symmetry', 'fil-music', 'first-blog'];
 const contentUrl = new URL(document.currentScript.src);
 const siteVersion = contentUrl.searchParams.get('v');
 const libraryBase = new URL('library/', contentUrl);
