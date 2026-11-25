@@ -631,9 +631,9 @@ const MusicPlayer = (() => {
       layout.innerHTML = '<span class="music-header">' + coverButton +
         '<span class="music-info"><span class="music-details" data-search-ignore></span>' +
         '<input class="music-seek" aria-label="播放进度" type="range" min="0" max="1" step="0.1" value="0" disabled>' +
-        '<span class="music-controls" data-search-ignore><span class="music-time">' +
+        '<span class="music-controls" data-search-ignore>' +
         '<button type="button" class="music-play-button">' + playIcon + '</button>' +
-        '<span class="music-timestamps"><span>0:00</span><span>--:--</span></span></span>' + volumeControl + '</span>' +
+        '<span class="music-timestamps"><span>0:00</span><span>--:--</span></span>' + volumeControl + '</span>' +
         '<span class="music-status" role="status" data-search-ignore hidden></span></span></span>' +
         '<span class="music-lyrics" role="region" aria-label="同步歌词" tabindex="0" data-search-ignore hidden></span>';
       player.prepend(layout);
@@ -648,16 +648,23 @@ const MusicPlayer = (() => {
       const [elapsed, duration] = layout.querySelectorAll('.music-timestamps > span');
       const status = layout.querySelector('.music-status');
       const lyrics = addLyrics(layout, track.lyrics, track.translation, seekTo);
+      let seekDrag;
       setCover(cover, track.cover);
+
+      function showSeekTime(time) {
+        elapsed.textContent = formatTime(time);
+        seek.setAttribute('aria-valuetext', elapsed.textContent + ' / ' + duration.textContent);
+      }
 
       function syncProgress() {
         const hasDuration = Number.isFinite(audio.duration);
         seek.disabled = !hasDuration;
         if (hasDuration) seek.max = audio.duration;
-        seek.value = audio.currentTime;
-        elapsed.textContent = formatTime(audio.currentTime);
         duration.textContent = hasDuration ? formatTime(audio.duration) : '--:--';
-        seek.setAttribute('aria-valuetext', elapsed.textContent + ' / ' + duration.textContent);
+        if (!seekDrag) {
+          seek.value = audio.currentTime;
+          showSeekTime(audio.currentTime);
+        }
         syncLyrics(lyrics, audio.currentTime);
         if (active === state) refreshDock();
       }
@@ -666,6 +673,12 @@ const MusicPlayer = (() => {
         if (lyrics) lyrics.browsingUntil = 0;
         audio.currentTime = Number.isFinite(audio.duration) ? Math.min(time, audio.duration) : time;
         syncProgress();
+      }
+
+      function finishSeekDrag(time) {
+        seekDrag = undefined;
+        if (time === undefined || seek.disabled) syncProgress();
+        else seekTo(time);
       }
 
       function syncPlayback() {
@@ -706,7 +719,34 @@ const MusicPlayer = (() => {
       observer.observe(player);
       cover.addEventListener('click', toggle);
       playButton.addEventListener('click', toggle);
-      seek.addEventListener('input', () => seekTo(Number(seek.value)));
+      seek.addEventListener('pointerdown', event => {
+        if (event.isPrimary && event.button === 0 && !seek.disabled) {
+          seekDrag = { pointerId: event.pointerId };
+        }
+      });
+      seek.addEventListener('input', () => {
+        const time = seek.valueAsNumber;
+        if (seekDrag) {
+          seekDrag.time = time;
+          showSeekTime(time);
+        } else {
+          seekTo(time);
+        }
+      });
+      window.addEventListener('pointerup', event => {
+        const drag = seekDrag;
+        if (drag?.pointerId !== event.pointerId) return;
+        // The native range control can send its final input after pointerup.
+        setTimeout(() => {
+          if (seekDrag === drag) finishSeekDrag(drag.time);
+        }, 0);
+      });
+      window.addEventListener('pointercancel', event => {
+        if (seekDrag?.pointerId === event.pointerId) finishSeekDrag();
+      });
+      window.addEventListener('blur', () => {
+        if (seekDrag) finishSeekDrag();
+      });
       syncVolume();
       audio.addEventListener('volumechange', syncVolume);
       audio.addEventListener('play', () => {

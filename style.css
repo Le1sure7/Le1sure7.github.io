@@ -26,7 +26,10 @@ button, input { font: inherit; color: inherit; }
 button, summary { cursor: pointer; }
 :focus-visible { outline: 3px solid #df9ecf; outline-offset: 3px; }
 main[tabindex="-1"]:focus { outline: none; }
-h1,h2,h3 { font-family: var(--round); }
+h1,h2,h3 {
+  font-family: var(--round);
+  font-synthesis: none;
+}
 .cover {
   position: relative; isolation: isolate; display: grid; place-items: center;
   min-height: 100vh; min-height: 100svh; padding: 6rem 22px;
@@ -99,7 +102,7 @@ summary::-webkit-details-marker { display: none; }
 .entry p,.reader p { margin: .5rem 0; }
 .entry small,.entry time,.entry p,footer,.return { color: var(--quiet); }
 .entry small,.entry time { font-size: .9rem; }
-footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: .9rem; }
+footer { display: flex; align-items: center; border-top: 1px solid var(--line); padding: 22px 0 40px; font-size: .9rem; }
 
 .reader {
   --reader-gutter: clamp(1rem, 5vw, 4rem);
@@ -142,14 +145,15 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
 /* GitHub mark from the octicons set (MIT, https://github.com/primer/octicons).
    Drawn with currentColor so the footer icon follows the day and night ink colours. */
 .github-profile {
-  display: inline-grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 32px;
+  padding-inline: 4px;
   border-radius: 5px;
   color: var(--quiet);
 }
-.github-profile:hover { color: var(--accent); }
+.github-profile:is(:hover, :focus-visible) { color: var(--accent); }
 .github-mark { display: block; }
 
 /* Blog filters, article navigation and Markdown content */
@@ -339,14 +343,21 @@ footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid va
 .music-details { color: var(--quiet); font-size: .85rem; }
 .music-seek, .music-volume input { min-width: 0; margin: 0; accent-color: var(--accent); }
 .music-seek { width: 100%; min-height: 24px; }
-.music-controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(min-content, 12.8rem) minmax(2rem, 1fr); align-items: center; gap: .4rem; }
-.music-time, .music-timestamps { display: flex; align-items: center; gap: .42rem; }
-.music-time { grid-column: 2; justify-content: space-between; color: var(--quiet); font-size: .75rem; font-variant-numeric: tabular-nums; }
-.music-timestamps { justify-content: center; width: 6rem; white-space: nowrap; }
-@media (max-width: 520px) {
-  .music-timestamps { width: auto; }
+.music-controls {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: clamp(.5rem, 2vw, .75rem);
 }
-.music-timestamps span + span::before { content: "/"; margin-inline-end: .42rem; }
+.music-timestamps {
+  display: flex;
+  gap: .35rem;
+  color: var(--quiet);
+  font-size: .75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.music-timestamps span + span::before { content: "/"; margin-inline-end: .35rem; }
 .music-volume { position: relative; justify-self: end; display: inline-flex; }
 .music-volume-trigger, .music-mute {
   display: grid;
