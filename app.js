@@ -232,6 +232,28 @@ function renderIndex() {
   render();
 }
 
+function prepareArticleVideos(article, posters = {}) {
+  const videos = [...article.querySelectorAll('.article-video')];
+  if (!videos.length) return;
+
+  const covers = new Map(Object.entries(posters).map(([source, poster]) =>
+    [new URL(source, document.baseURI).href, poster]));
+  const tracks = article.querySelectorAll('.article-audio audio');
+  for (const video of videos) {
+    const poster = covers.get(video.src);
+    if (poster) video.poster = poster;
+    video.volume = 0.3;
+    video.addEventListener('play', () => {
+      for (const track of tracks) track.pause();
+    });
+  }
+  for (const track of tracks) {
+    track.addEventListener('play', () => {
+      if (videos.some(video => !video.paused && !video.ended)) track.pause();
+    });
+  }
+}
+
 function renderPost() {
   const params = new URLSearchParams(location.search);
   const post = posts.find(item => item.id === params.get('id'));
@@ -260,6 +282,7 @@ function renderPost() {
   details.hidden = false;
 
   BlogArticle.render(post, article, $('#contents'), $('#copy-status'));
+  prepareArticleVideos(article, post.videoPosters);
   MusicPlayer.mount(article, post.audio);
   const pattern = BlogArticle.queryPattern(params.get('q') || '');
   let target;
