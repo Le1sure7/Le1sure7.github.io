@@ -16,7 +16,7 @@ posts.push({
     }
   },
   videoPosters: {
-    'media/PowderSnow/powder-snow-amv.mp4': 'media/白色相簿/白色相簿 interlude『POWDER SNOW (Live Ver.)』.jpg'
+    'media/PowderSnow/powder-snow-amv.mp4?v=20261127-3': 'media/白色相簿/白色相簿 interlude『POWDER SNOW (Live Ver.)』.jpg'
   },
   markdown: `今天就推首歌吧（后面可能会把我以前听的歌弄几首吧，可惜最近没听到啥特别好听的）
 
@@ -30,7 +30,7 @@ Anyway，听歌吧，我可能两首里会推荐水树奈奈和平野绫的，�
 ![POWDER SNOW](<media/PowderSnow/POWDER SNOW - 小木曽雪菜 (Setsuna Ogiso).flac>)
 
 AMV: **白色相簿 interlude『POWDER SNOW (Live Ver.)』**- By [**shi健忘**](https://space.bilibili.com/158297334) From Bilibili
-![白色相簿 interlude『POWDER SNOW (Live Ver.)』](media/PowderSnow/powder-snow-amv.mp4)
+![白色相簿 interlude『POWDER SNOW (Live Ver.)』](media/PowderSnow/powder-snow-amv.mp4?v=20261127-3)
 
 今天图书馆泡了一天，晚上出去买了点吃的，没啥特别的事，就是今天学校活动多了点，还是有点累。
 
